@@ -16,10 +16,6 @@ This GitHub repository hosts a project aimed at efficiently organizing laborator
 
 - **User Authentication**: Implement secure user authentication to control access and ensure that only authorized personnel can make changes to the material database.
 
-## License
-
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute the code as needed.
-
 ## Acknowledgments
 
 - Special thanks to the QR Code generation library contributors.
