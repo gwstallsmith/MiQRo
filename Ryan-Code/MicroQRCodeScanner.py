@@ -15,15 +15,18 @@ imgname = imgpath[imgpath.rfind("/")+1:imgpath.rfind(".")]
 imgFile = imgpath[imgpath.rfind("/")+1:len(imgpath)]
 print(imgname)
 print("applications.jar file")
-#scannerPath = askopenfilename()
-scannerPath = "C:/users/rwojtowi_stu/Desktop/boofcv implementation/boofcv/applications/applications.jar"
+scannerPath = askopenfilename()
+#scannerPath = "C:/users/rwojtowi_stu/Desktop/boofcv implementation/boofcv/applications/applications.jar"
+#scannerPath = input("scannerPath: ")
 print("json output directory")
-#outputPath = askdirectory()
-outputPath = "C:/users/rwojtowi_stu/desktop"
+outputPath = askdirectory()
+#outputPath = "C:/users/rwojtowi_stu/desktop"
+#outputPath = input("outputPath: ")
 #AI Upscale Model path
 print("AI Upscale model path")
-#AIpath = askopenfilename()
-AIpath = "C:\\Users\\rwojtowi_stu\\downloads\\espcn_x2.pb"
+AIpath = askopenfilename()
+#AIpath = "C:\\Users\\rwojtowi_stu\\downloads\\espcn_x2.pb"
+#AIpath = input("AIpath: ")
 
 sr = cv2.dnn_superres.DnnSuperResImpl_create()
 sr.readModel(AIpath)
@@ -38,6 +41,9 @@ img = cv2.imread(imgpath)
 imgX = img.shape[1]
 imgY = img.shape[0]
 #Run MicroQR Scanner
+print(imgpath + '\n')
+imgpath = 'QRSamsungFar.png'
+print(imgpath + '\n')
 os.system("java -jar \""+scannerPath+"\" BatchScanMicroQrCodes -i \""+imgpath+"\" -o \""+outputPath+"/"+imgname+".json\"")
 
 #Set Json Paths
