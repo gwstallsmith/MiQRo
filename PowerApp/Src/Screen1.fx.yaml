@@ -75,7 +75,7 @@ Screen1 As screen:
 
     Image3 As image:
         Height: =158
-        Image: =varPhoto
+        Image: =varTakenPhoto
         Width: =152
         X: =307
         Y: =874
