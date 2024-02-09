@@ -36,6 +36,7 @@
       "enablechatbotfeature": true,
       "enablecomponentnamemaps": false,
       "enablecomponentscopeoldbehavior": false,
+      "enablecopilotanswercontrol": false,
       "enablecopilotcontrol": true,
       "enabledataverseoffline": false,
       "enableeditcacherefreshfrequency": false,
@@ -99,16 +100,16 @@
       "zeroalltabindexes": false
     },
     "Author": "",
-    "BindingErrorCount": 0,
+    "BindingErrorCount": 3,
     "ContainsThirdPartyPcfControls": false,
     "DefaultConnectedDataSourceMaxGetRowsCount": 500,
     "DocumentAppType": "DesktopOrTablet",
-    "DocumentLayoutHeight": 768,
-    "DocumentLayoutLockOrientation": false,
+    "DocumentLayoutHeight": 1366,
+    "DocumentLayoutLockOrientation": true,
     "DocumentLayoutMaintainAspectRatio": true,
-    "DocumentLayoutOrientation": "landscape",
+    "DocumentLayoutOrientation": "portrait",
     "DocumentLayoutScaleToFit": true,
-    "DocumentLayoutWidth": 1366,
+    "DocumentLayoutWidth": 768,
     "DocumentType": "App",
     "EnableInstrumentation": false,
     "FileID": "8d1037e9-975a-4e39-bd16-c3759472b34e",
@@ -119,7 +120,7 @@
     "Name": "QR Creator - copy",
     "OriginatingVersion": "1.335",
     "ParserErrorCount": 0,
-    "ShowStatusBar": false
+    "ShowStatusBar": true
   },
   "PublishInfo": {
     "AppName": "QR Creator - copy",

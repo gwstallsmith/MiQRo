@@ -1,4 +1,18 @@
 {
+  "addMedia": {
+    "CustomGroupControlTemplateName": "",
+    "FirstParty": true,
+    "Id": "http://microsoft.com/appmagic/addMedia",
+    "IsComponentTemplate": false,
+    "IsCustomGroupControlTemplate": false,
+    "IsPcfControl": false,
+    "IsPremiumPcfControl": false,
+    "IsWidgetTemplate": true,
+    "LastModifiedTimestamp": "0",
+    "Name": "addMedia",
+    "OverridableProperties": {},
+    "Version": "2.2.1"
+  },
   "appinfo": {
     "CustomGroupControlTemplateName": "",
     "FirstParty": true,
@@ -27,6 +41,20 @@
     "OverridableProperties": {},
     "Version": "2.2.0"
   },
+  "camera": {
+    "CustomGroupControlTemplateName": "",
+    "FirstParty": true,
+    "Id": "http://microsoft.com/appmagic/camera",
+    "IsComponentTemplate": false,
+    "IsCustomGroupControlTemplate": false,
+    "IsPcfControl": false,
+    "IsPremiumPcfControl": false,
+    "IsWidgetTemplate": true,
+    "LastModifiedTimestamp": "0",
+    "Name": "camera",
+    "OverridableProperties": {},
+    "Version": "2.4.0"
+  },
   "gallery": {
     "CustomGroupControlTemplateName": "",
     "FirstParty": true,
@@ -54,6 +82,20 @@
     "Name": "galleryTemplate",
     "OverridableProperties": {},
     "Version": "1.0"
+  },
+  "group": {
+    "CustomGroupControlTemplateName": "",
+    "FirstParty": true,
+    "Id": "http://microsoft.com/appmagic/group",
+    "IsComponentTemplate": false,
+    "IsCustomGroupControlTemplate": false,
+    "IsPcfControl": false,
+    "IsPremiumPcfControl": false,
+    "IsWidgetTemplate": false,
+    "LastModifiedTimestamp": "0",
+    "Name": "group",
+    "OverridableProperties": {},
+    "Version": "1"
   },
   "groupContainer": {
     "FirstParty": true,
@@ -121,161 +163,6 @@
     "Name": "label",
     "OverridableProperties": {},
     "Version": "2.5.1"
-  },
-  "Measure in MR (preview)": {
-    "CustomGroupControlTemplateName": "",
-    "FirstParty": true,
-    "Id": "http://microsoft.com/appmagic/powercontrol/MeasureInMR",
-    "IsComponentTemplate": false,
-    "IsCustomGroupControlTemplate": false,
-    "IsPcfControl": true,
-    "IsPremiumPcfControl": false,
-    "IsWidgetTemplate": false,
-    "LastModifiedTimestamp": "0",
-    "Name": "MeasureInMR",
-    "OverridableProperties": {
-      "Measurements": {
-        "Type": {
-          "EnumString": "",
-          "Kind": "Table",
-          "Name": "Root",
-          "Type": [
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "Area",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "BoundingDepth",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "BoundingWidth",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "Height",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "Id",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "String",
-              "Name": "Label",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "Length",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Table",
-              "Name": "Segments",
-              "Type": [
-                {
-                  "EnumString": "",
-                  "Kind": "Number",
-                  "Name": "DirectionX",
-                  "Type": []
-                },
-                {
-                  "EnumString": "",
-                  "Kind": "Number",
-                  "Name": "DirectionY",
-                  "Type": []
-                },
-                {
-                  "EnumString": "",
-                  "Kind": "Number",
-                  "Name": "DirectionZ",
-                  "Type": []
-                },
-                {
-                  "EnumString": "",
-                  "Kind": "Number",
-                  "Name": "Length",
-                  "Type": []
-                }
-              ]
-            },
-            {
-              "EnumString": "",
-              "Kind": "String",
-              "Name": "Unit",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "Volume",
-              "Type": []
-            }
-          ]
-        },
-        "Version": "1.336"
-      },
-      "Photos": {
-        "Type": {
-          "EnumString": "",
-          "Kind": "Table",
-          "Name": "Root",
-          "Type": [
-            {
-              "EnumString": "",
-              "Kind": "Number",
-              "Name": "FileSize",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "Image",
-              "Name": "ImageURI",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "String",
-              "Name": "Label",
-              "Type": []
-            },
-            {
-              "EnumString": "",
-              "Kind": "String",
-              "Name": "MimeType",
-              "Type": []
-            }
-          ]
-        },
-        "Version": "1.336"
-      }
-    },
-    "PCFDynamicSchemaForIRRetrieval": {
-      "Measurements": {
-        "DynamicSchema": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"Label\":{\"type\":\"string\"},\"Id\":{\"type\":\"number\"},\"Length\":{\"type\":\"number\"},\"Height\":{\"type\":\"number\"},\"Unit\":{\"type\":\"string\"},\"Segments\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"Length\":{\"type\":\"number\"},\"DirectionX\":{\"type\":\"number\"},\"DirectionY\":{\"type\":\"number\"},\"DirectionZ\":{\"type\":\"number\"}}}},\"Area\":{\"type\":\"number\"},\"Volume\":{\"type\":\"number\"},\"BoundingWidth\":{\"type\":\"number\"},\"BoundingDepth\":{\"type\":\"number\"}}}}",
-        "PCFSkipValidation": false
-      },
-      "Photos": {
-        "DynamicSchema": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ImageURI\":{\"type\":\"string\",\"format\":\"uri\",\"x-ms-media-kind\":\"image\"},\"MimeType\":{\"type\":\"string\"},\"FileSize\":{\"type\":\"number\"},\"Label\":{\"type\":\"string\"}}}}",
-        "PCFSkipValidation": false
-      }
-    },
-    "TemplateDisplayName": "Measure in MR (preview)",
-    "Version": "1.0.23"
   },
   "rectangle": {
     "CustomGroupControlTemplateName": "",
