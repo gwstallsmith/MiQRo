@@ -69,7 +69,8 @@ Screen1 As screen:
     Camera As camera:
         Camera: =
         Height: =530
-        StreamRate: =1000
+        StreamRate: |
+            =0
         Width: =768
         Y: =156
         ZIndex: =4
