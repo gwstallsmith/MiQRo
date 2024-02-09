@@ -2,7 +2,7 @@ Screen1 As screen:
 
     "Gallery1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageTwoColumnOverlayVariant_ver5.0'":
         DelayItemLoading: =true
-        Height: =768
+        Height: =186
         Items: =Search('Generated Barcode SVGs', TextInput1.Text, "Title")
         Layout: =Layout.Vertical
         LoadingSpinner: =LoadingSpinner.Data
@@ -22,13 +22,6 @@ Screen1 As screen:
             RadiusTopRight: =8
             Width: =243.25
             ZIndex: =1
-
-        Overlay1 As rectangle:
-            Height: =108
-            OnSelect: =Select(Parent)
-            Width: =Parent.TemplateWidth
-            Y: =122
-            ZIndex: =2
 
         Title1 As label:
             Height: =Self.Size * 1.8
@@ -65,15 +58,6 @@ Screen1 As screen:
         Y: =27
         ZIndex: =1
 
-    Button1 As button:
-        OnSelect: |
-            =Set(varOutput,CreateCode.Run(TextInput1.Text));
-            Refresh('Generated Barcode SVGs')
-        Text: ="Create Code"
-        X: =315
-        Y: =633
-        ZIndex: =2
-
     Label1 As label:
         Height: =111
         Text: =varOutput.resultoutput
@@ -82,32 +66,25 @@ Screen1 As screen:
         Y: =328
         ZIndex: =3
 
-    AddMediaWithImage1 As group:
-        Height: =5
-        Width: =5
-        X: =40
-        Y: =40
+    Camera As camera:
+        Camera: =0
+        Height: =530
+        Width: =768
+        Y: =156
+        ZIndex: =4
+
+    Image3 As image:
+        Image: =varPhoto
+        X: =334
+        Y: =866
         ZIndex: =5
 
-        UploadedImage1 As image:
-            Height: =AddMediaButton1.Height
-            Image: =If(IsBlank(AddMediaButton1.Media), SampleImage, AddMediaButton1.Media)
-            ImagePosition: =ImagePosition.Fill
-            Width: =AddMediaButton1.Width
-            X: =AddMediaButton1.X
-            Y: =AddMediaButton1.Y
-            ZIndex: =6
-
-        AddMediaButton1 As addMedia:
-            Size: =25
-            X: =220
-            Y: =868
-            ZIndex: =7
-
-    Camera2 As camera:
-        Camera: =0
-        OnSelect: =Collect( MyPix, MyCamera.Photo )
-        X: =188
-        Y: =468
-        ZIndex: =8
+    Icon1 As icon.Camera:
+        Height: =114
+        Icon: =Icon.Camera
+        OnSelect: =Set(varPhoto, Camera.Stream) 
+        Width: =140
+        X: =314
+        Y: =1252
+        ZIndex: =6
 
