@@ -74,15 +74,17 @@ Screen1 As screen:
         ZIndex: =4
 
     Image3 As image:
+        Height: =158
         Image: =varPhoto
-        X: =334
-        Y: =866
+        Width: =152
+        X: =307
+        Y: =874
         ZIndex: =5
 
     Icon1 As icon.Camera:
         Height: =114
         Icon: =Icon.Camera
-        OnSelect: =Set(varPhoto, Camera.Stream) 
+        OnSelect: =Set(varTakenPhoto, Camera.Stream) 
         Width: =140
         X: =314
         Y: =1252
