@@ -1,0 +1,106 @@
+Screen1 As screen:
+
+    "Gallery1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageTwoColumnOverlayVariant_ver5.0'":
+        DelayItemLoading: =true
+        Height: =768
+        Items: =Search('Generated Barcode SVGs', TextInput1.Text, "Title")
+        Layout: =Layout.Vertical
+        LoadingSpinner: =LoadingSpinner.Data
+        TemplatePadding: =4
+        TemplateSize: =230
+        Width: =992
+        WrapCount: =4
+        X: =372
+        ZIndex: =1
+
+        Image2 As image:
+            Height: =228
+            Image: =First(ThisItem.Attachments).Value
+            OnSelect: =Select(Parent)
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Width: =243.25
+            ZIndex: =1
+
+        Overlay1 As rectangle:
+            Height: =108
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =120
+            ZIndex: =2
+
+        Title1 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.Title
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - 64
+            X: =32
+            Y: =Overlay1.Y + 16
+            ZIndex: =3
+
+        Subtitle1 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.'Created By'.DisplayName
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title1.Width
+            X: =Title1.X
+            Y: =Title1.Y + Title1.Height + 8
+            ZIndex: =4
+
+    TextInput1 As text:
+        Default: =
+        HintText: ="Search or Create"
+        X: =27
+        Y: =27
+        ZIndex: =1
+
+    Button1 As button:
+        OnSelect: |
+            =Set(varOutput,CreateCode.Run(TextInput1.Text));
+            Refresh('Generated Barcode SVGs')
+        Text: ="Create Code"
+        X: =27
+        Y: =91
+        ZIndex: =2
+
+    Label1 As label:
+        Height: =111
+        Text: =varOutput.resultoutput
+        Width: =391
+        X: =27
+        Y: =152
+        ZIndex: =3
+
+    "MeasureInMR1 As 'Measure in MR (preview)'.pcfdataset":
+        BorderFillColor: =RGBA(47, 81, 151, 1)
+        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+        DisabledContentColor: =RGBA(166, 166, 166, 1)
+        DisabledFillColor: =RGBA(244, 244, 244, 1)
+        DisplayMode: =DisplayMode.Edit
+        FillColor: =RGBA(56, 96, 178, 1)
+        Height: =70
+        HoverBorderColor: =RGBA(88, 115, 171, 1)
+        HoverContentColor: =RGBA(255, 255, 255, 1)
+        HoverFillColor: =RGBA(47, 81, 151, 1)
+        OnMixedRealitySelect: =false
+        PressedBorderColor: =RGBA(56, 96, 178, 1)
+        PressedContentColor: =RGBA(56, 96, 178, 1)
+        PressedFillColor: =RGBA(255, 255, 255, 1)
+        TextColor: =RGBA(255, 255, 255, 1)
+        Width: =280
+        X: =47
+        Y: =320
+        ZIndex: =4
+

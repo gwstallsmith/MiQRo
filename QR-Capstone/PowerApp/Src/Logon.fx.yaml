@@ -1,0 +1,63 @@
+Logon As screen:
+
+    BackgroundImage_3 As image:
+        Height: =768
+        Image: =
+        ImagePosition: =ImagePosition.Fill
+        Transparency: =0.9
+        Width: =1366
+        ZIndex: =1
+
+    Label2 As label:
+        Height: =52
+        Text: |-
+            ="You'll need permission to use this app, email: cas-support@kent.edu to request."
+        Width: =400
+        X: =175
+        Y: =307
+        ZIndex: =2
+
+    Label3 As label:
+        Text: =User().FullName
+        Width: =550
+        X: =175
+        Y: =267
+        ZIndex: =3
+
+    Image4 As image:
+        Image: =User().Image
+        RadiusBottomLeft: =90
+        RadiusBottomRight: =90
+        RadiusTopLeft: =90
+        RadiusTopRight: =90
+        X: =55
+        Y: =259
+        ZIndex: =4
+
+    Button1_1 As button:
+        OnSelect: |-
+            =Set(flowNavigation, GetAppUser.Run(User().Email));
+            //Switch(flowNavigation, "Screen2", Navigate(flowNavigation, ScreenTransition.Fade ));
+            Set(labelText, flowNavigation);
+            Switch( labelText.output, "Yes", Navigate( Screen1, ScreenTransition.Fade ) )
+        Text: ="Log In"
+        X: =67
+        Y: =406
+        ZIndex: =5
+
+    Label4 As label:
+        Text: =labelText.output
+        X: =280
+        Y: =406
+        ZIndex: =6
+
+    Icon2 As icon.Edit:
+        Height: =28
+        Icon: =Icon.Edit
+        OnSelect: |-
+            =Launch("https://nam.delve.office.com/?v=editprofile")
+        Width: =28
+        X: =127
+        Y: =342
+        ZIndex: =7
+
