@@ -132,4 +132,8 @@ def homepage():
     return render_template('index.html', session = session.get("user"))
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     app.run(debug=True)
+=======
+    app.run(host="0.0.0.0", port=env.get("PORT", 5000))
+>>>>>>> 88d3d457c3d22452799a9248c461f29a8f8370c3
