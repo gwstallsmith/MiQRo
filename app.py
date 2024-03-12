@@ -18,6 +18,8 @@ from authlib.integrations.base_client.errors import OAuthError
 from Scanner.MicroQRCodeScanner import do_stuff
 import base64
 
+from database import *
+from crypto import *
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -25,16 +27,6 @@ if ENV_FILE:
 
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
-
-# Connect app to mysql server
-mydb =  MySQLDatabase(os.getenv("MYSQL_DATABASE"),
-        user = os.getenv("MYSQL_USER"),
-        password = os.getenv("MYSQL_PASSWORD"),
-        host = os.getenv("MYSQL_HOST"),
-        port = 3306
-)
-print(mydb)
-
 
 upload_folder = './uploads'
 
@@ -132,8 +124,5 @@ def homepage():
     return render_template('index.html', session = session.get("user"))
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(debug=True)
-=======
     app.run(host="0.0.0.0", port=env.get("PORT", 5000))
->>>>>>> 88d3d457c3d22452799a9248c461f29a8f8370c3
