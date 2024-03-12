@@ -2,3 +2,4 @@ python3venv/
 .env
 qrenv/
 qrvenv/
+winvenv/
