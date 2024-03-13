@@ -18,8 +18,6 @@ from authlib.integrations.base_client.errors import OAuthError
 from Scanner.MicroQRCodeScanner import do_stuff
 import base64
 
-from database import *
-
 from cryptography import *
 import hashlib
 import base64

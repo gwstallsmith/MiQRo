@@ -21,6 +21,13 @@ import base64
 from database import *
 from crypto import *
 
+import os
+from peewee import *
+
+from os import environ as env
+
+
+
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
