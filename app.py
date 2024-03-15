@@ -18,6 +18,15 @@ from authlib.integrations.base_client.errors import OAuthError
 from Scanner.MicroQRCodeScanner import do_stuff
 import base64
 
+from database import *
+from crypto import *
+
+import os
+from peewee import *
+
+from os import environ as env
+
+
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -25,8 +34,6 @@ if ENV_FILE:
 
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
-
-
 
 upload_folder = './uploads'
 
