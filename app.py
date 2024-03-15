@@ -26,14 +26,6 @@ if ENV_FILE:
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
 
-# Connect app to mysql server
-mydb =  MySQLDatabase(os.getenv("MYSQL_DATABASE"),
-        user = os.getenv("MYSQL_USER"),
-        password = os.getenv("MYSQL_PASSWORD"),
-        host = os.getenv("MYSQL_HOST"),
-        port = 3306
-)
-print(mydb)
 
 
 upload_folder = './uploads'
