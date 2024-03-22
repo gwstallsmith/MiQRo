@@ -18,10 +18,23 @@
 
 
     <br>
+    <!--
     <label for="inputUsername">Username:</label>
-    <input type="text" id="inputUsername" name="username" required><br>
+    <input type="text" id="inputUsername" name="username"><br>
+    <label for="inputUsername">Email:</label>
+    <input type="text" id="inputEmail" name="email" required><br>
     <label for="inputPassword">Password:</label>
-    <input type="password" id="inputPassword" name="password" required><br>
+    <input type="password" id="inputPassword" name="password" required><br>-->
+
+    <form id="user-create-form" action="/api/user_create" method="post" enctype="multipart/form-data">
+      <!--<input class="form-control" type="text" id="name" name="name" placeholder="Your Name"><br>-->
+    
+      <input class="form-control" type="text" id="email" name="email" placeholder="Your Email"><br>
+      <input class="form-control" type="text" id="password" name="password" placeholder="Your Password"><br>
+
+        
+      <button class="btn btn-primary btn-xl text-uppercase" value="submit" id="submit" type="submit">Add User</button>
+    </form>    
 
   </body>
 </html>

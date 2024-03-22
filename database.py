@@ -1,14 +1,7 @@
 import os
 from peewee import *
-
-from os import environ as env
-
 from crypto import *
 
-import os
-from peewee import *
-
-from os import environ as env
 
 
 # Initialize database connection as a global variable

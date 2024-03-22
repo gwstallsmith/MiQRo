@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from PIL import Image
 import io
 import tempfile
-import subprocess
 import os
 from peewee import *
 
@@ -25,7 +24,10 @@ import os
 from peewee import *
 
 from os import environ as env
+from playhouse.shortcuts import model_to_dict
+from dotenv import load_dotenv
 
+load_dotenv()
 
 
 ENV_FILE = find_dotenv()
@@ -130,5 +132,30 @@ def homepage():
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
     return render_template('index.html', session = session.get("user"))
 
+# ==========================================================================
+# CREATING ENDPOINTS TO TEST USER REGISTRATION
+@app.route('/api/user_create', methods=['POST'])
+def postUserCreated():
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    user_created = Users.create(email = email, password = password)
+
+    return model_to_dict(user_created)
+
+@app.route('/api/user_create', methods=['GET'])
+def getUserCreated():
+   
+    users_created = [
+        model_to_dict(p)
+        for p in Users
+    ]
+
+    if not users_created:
+        return {'users_created': len(users_created)}
+
+    return {'users_created': users_created}
+
+# ==========================================================================
 if __name__ == "__main__":
     app.run(debug=True)
