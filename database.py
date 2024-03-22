@@ -11,38 +11,53 @@ from peewee import *
 from os import environ as env
 
 
-# Initialize database connection as a global variable
-db =  MySQLDatabase(os.getenv("MYSQL_DATABASE"),
-        user = os.getenv("MYSQL_USER"),
-        password = os.getenv("MYSQL_PASSWORD"),
-        host = os.getenv("MYSQL_HOST"),
-        port = 3306
-)
+from peewee import *
 
-print(db)
+# Define your MySQL database connection parameters
+database = MySQLDatabase('your_database_name', user='your_username', password='your_password', host='localhost', port=3306)
 
+# Define your Peewee models
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = database
 
 class Users(BaseModel):
-    user_id = CharField(primary_key=True)
-    email = CharField(unique=True)
-    password = CharField()
+    user_id = TextField(primary_key=True)
+    email = TextField(unique=True)
 
+class Group_Template(BaseModel):
+    group_id = IntegerField(primary_key=True)
+    attribute_id = TextField()
+    attribute_name = TextField()
 
-# Create tables if they do not exist
-#def create_tables():
-#    with database:
-#        database.create_tables([Users])
+class Groups(BaseModel):
+    group_id = IntegerField(primary_key=True)
+    lab_id = IntegerField()
+    group_name = TextField()
 
-# Drop tables if they exist
-def drop_tables():
-    with db:
-        db.drop_tables([Users])
+class Lab_Permissions(BaseModel):
+    user_id = TextField()
+    lab_id = IntegerField()
+    lab_admin = IntegerField(constraints=[Check('lab_admin IN (0, 1)')])
 
+    class Meta:
+        primary_key = CompositeKey('user_id', 'lab_id')
 
-db.connect()
-db.create_tables([Users])
+class Labs(BaseModel):
+    lab_id = TextField(primary_key=True)
+    lab_name = TextField(unique=True)
+
+class QR_Template(BaseModel):
+    qr_id = IntegerField(primary_key=True)
+    attribute_1 = TextField()
+    attribute_2 = TextField()
+    attribute_3 = TextField()
+    attribute_4 = TextField()
+    attribute_5 = TextField()
+    attribute_6 = TextField()
+    attribute_7 = TextField()
+    attribute_8 = TextField()
+    attribute_9 = TextField()
+    attribute_10 = TextField()
 
 

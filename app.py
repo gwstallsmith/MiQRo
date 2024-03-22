@@ -130,5 +130,15 @@ def homepage():
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
     return render_template('index.html', session = session.get("user"))
 
+
+@app.route("/install_database")
+def install_database():
+    database.connect()
+    database.create_tables([Users, Group_Template, Groups, Lab_Permissions, Labs, QR_Template])
+    database.close()  
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
