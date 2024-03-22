@@ -1,17 +1,7 @@
 import os
 from peewee import *
-
-from os import environ as env
-
 from crypto import *
 
-import os
-from peewee import *
-
-from os import environ as env
-
-
-from peewee import *
 
 # Define your MySQL database connection parameters
 database = MySQLDatabase('your_database_name', user='your_username', password='your_password', host='localhost', port=3306)
