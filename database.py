@@ -1,5 +1,6 @@
 import os
 from peewee import *
+
 from crypto import *
 
 
@@ -19,7 +20,7 @@ class BaseModel(Model):
         database = db
 
 class Users(BaseModel):
-    user_id = CharField(primary_key=True)
+    user_id = PrimaryKeyField()
     email = CharField(unique=True)
     password = CharField()
 
