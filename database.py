@@ -20,9 +20,10 @@ class BaseModel(Model):
         database = db
 
 class Users(BaseModel):
-    user_id = PrimaryKeyField()
+    user_id = IntegerField(unique=True, primary_key=True)
     email = CharField(unique=True)
     password = CharField()
+
 
 
 # Create tables if they do not exist

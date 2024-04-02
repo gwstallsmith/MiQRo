@@ -139,7 +139,15 @@ def postUserCreated():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    user_created = Users.create(email = email, password = password)
+    new_id = Users.select(fn.MAX(Users.user_id)).scalar()
+
+    if(not (Users.select().count() > 0)):
+       new_id = 0
+
+    new_id += 1
+
+    user_created = Users.create(user_id = new_id, email = email, password = password)
+
 
     return model_to_dict(user_created)
 
@@ -155,6 +163,16 @@ def getUserCreated():
         return {'users_created': len(users_created)}
 
     return {'users_created': users_created}
+
+@app.route('/api/user_delete', methods=['GET'])
+def deleteUser():
+    Users.delete().where(Users.user_id < 5).execute()
+
+    users = [
+        model_to_dict(p)
+        for p in Users
+    ]
+    return {'users': users}
 
 # ==========================================================================
 if __name__ == "__main__":
