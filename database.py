@@ -1,14 +1,8 @@
 import os
 from peewee import *
 
-from os import environ as env
-
 from crypto import *
 
-import os
-from peewee import *
-
-from os import environ as env
 
 
 # Initialize database connection as a global variable
@@ -26,7 +20,7 @@ class BaseModel(Model):
         database = db
 
 class Users(BaseModel):
-    user_id = CharField(primary_key=True)
+    user_id = PrimaryKeyField()
     email = CharField(unique=True)
     password = CharField()
 
