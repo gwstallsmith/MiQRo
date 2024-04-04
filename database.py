@@ -1,6 +1,5 @@
 import os
 from peewee import *
-
 from crypto import *
 
 
@@ -20,8 +19,8 @@ class BaseModel(Model):
         database = db
 
 class Users(BaseModel):
-    user_id = PrimaryKeyField()
-    email = CharField(unique=True)
+    user_id = AutoField(primary_key=True)
+    email = CharField()
     password = CharField()
 
 
@@ -34,7 +33,7 @@ class Users(BaseModel):
 def drop_tables():
     with db:
         db.drop_tables([Users])
-
+drop_tables()
 
 db.connect()
 db.create_tables([Users])

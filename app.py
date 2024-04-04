@@ -134,16 +134,17 @@ def homepage():
 
 # ==========================================================================
 # CREATING ENDPOINTS TO TEST USER REGISTRATION
-@app.route('/api/user_create', methods=['POST'])
+@app.route('/api/user', methods=['POST'])
 def postUserCreated():
     email = request.form.get('email')
     password = request.form.get('password')
 
     user_created = Users.create(email = email, password = password)
+    
 
     return model_to_dict(user_created)
 
-@app.route('/api/user_create', methods=['GET'])
+@app.route('/api/user', methods=['GET'])
 def getUserCreated():
    
     users_created = [
@@ -157,5 +158,14 @@ def getUserCreated():
     return {'users_created': users_created}
 
 # ==========================================================================
+@app.route('/api/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    try:
+        user = Users.get_by_id(user_id)
+        user.delete_instance()
+        return {'message': 'User deleted successfully'}
+    except Users.DoesNotExist:
+        return {'error': 'User with that id not found'}
+
 if __name__ == "__main__":
     app.run(debug=True)
