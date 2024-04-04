@@ -24,6 +24,7 @@ class Users(BaseModel):
     password = CharField()
 
 
+
 # Create tables if they do not exist
 #def create_tables():
 #    with database:

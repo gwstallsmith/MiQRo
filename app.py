@@ -157,6 +157,16 @@ def getUserCreated():
 
     return {'users_created': users_created}
 
+@app.route('/api/user_delete', methods=['GET'])
+def deleteUser():
+    Users.delete().where(Users.user_id < 5).execute()
+
+    users = [
+        model_to_dict(p)
+        for p in Users
+    ]
+    return {'users': users}
+
 # ==========================================================================
 @app.route('/api/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
