@@ -157,7 +157,7 @@ def postUserCreated():
     user_created = Users.create(email = email, password = password)
     
 
-    return model_to_dict(user_created), render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/api/login', methods=['POST'])
 def userLogin():
