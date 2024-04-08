@@ -34,7 +34,7 @@ class Users(BaseModel):
 def drop_tables():
     with db:
         db.drop_tables([Users])
-drop_tables()
+#drop_tables()
 
 db.connect()
 db.create_tables([Users])

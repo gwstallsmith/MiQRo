@@ -9,7 +9,7 @@
     <p><a href="/logout" id="qsLogoutBtn">Logout</a></p>
     <div><pre>{{pretty}}</pre></div>
     {% else %}
-    <h1 id="profileDropDown">Welcome Guest</h1>
+    <h1 id="profileDropDown">Register Page</h1>
     {% if error %}
     <h3>{{error}}</h3>
     {% endif %}
@@ -26,7 +26,7 @@
     <label for="inputPassword">Password:</label>
     <input type="password" id="inputPassword" name="password" required><br>-->
 
-    <form id="user-create-form" action="/api/user" method="post" enctype="multipart/form-data">
+    <form id="user-create-form" action="/api/register" method="post" enctype="multipart/form-data">
       <!--<input class="form-control" type="text" id="name" name="name" placeholder="Your Name"><br>-->
     
       <input class="form-control" type="text" id="email" name="email" placeholder="Your Email"><br>

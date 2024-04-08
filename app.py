@@ -4,6 +4,7 @@ import io
 import tempfile
 import os
 from peewee import *
+import re
 
 import json
 from os import environ as env
@@ -62,7 +63,7 @@ def main():
         error = session['error']
         session.pop('error')
     return render_template(
-        "home.html",
+        "login.html",
         session=session.get("user"),
         pretty=json.dumps(session.get("user"), indent=4),
         error=error,
@@ -86,6 +87,11 @@ def login():
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
+
+@app.route("/register")
+def register():
+    return render_template('register.html')
+
 
 
 @app.route("/logout")
@@ -133,16 +139,44 @@ def homepage():
     return render_template('index.html', session = session.get("user"))
 
 # ==========================================================================
-# CREATING ENDPOINTS TO TEST USER REGISTRATION
-@app.route('/api/user', methods=['POST'])
+# CREATING ENDPOINTS FOR USER REGISTRATION
+@app.route('/api/register', methods=['POST'])
 def postUserCreated():
     email = request.form.get('email')
-    password = request.form.get('password')
+    password = hash_password(request.form.get('password'))
+    if not email:
+        return {'error': 'Invalid email'}, 400
+    if not password:
+        return {'error': 'Invalid email'}, 400
+    
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
+
 
     user_created = Users.create(email = email, password = password)
     
 
-    return model_to_dict(user_created)
+    return model_to_dict(user_created), render_template('login.html')
+
+@app.route('/api/login', methods=['POST'])
+def userLogin():
+    email = request.form.get('email')
+    password = hash_password(request.form.get('password'))
+    if not email:
+        return {'error': 'Invalid email'}, 400
+    if not password:
+        return {'error': 'Invalid email'}, 400
+    
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
+    
+    try:
+        user = Users.get(Users.email == email, Users.password == password)
+        return {'message': 'User logged in successfully'}
+    except Users.DoesNotExist:
+        return {'message': 'User not found'}
+    
+
 
 @app.route('/api/user', methods=['GET'])
 def getUserCreated():
@@ -157,17 +191,7 @@ def getUserCreated():
 
     return {'users_created': users_created}
 
-@app.route('/api/user_delete', methods=['GET'])
-def deleteUser():
-    Users.delete().where(Users.user_id < 5).execute()
 
-    users = [
-        model_to_dict(p)
-        for p in Users
-    ]
-    return {'users': users}
-
-# ==========================================================================
 @app.route('/api/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     try:
@@ -176,6 +200,6 @@ def delete_user(user_id):
         return {'message': 'User deleted successfully'}
     except Users.DoesNotExist:
         return {'error': 'User with that id not found'}
-
+# ==========================================================================
 if __name__ == "__main__":
     app.run(debug=True)
