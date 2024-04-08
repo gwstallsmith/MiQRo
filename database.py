@@ -1,14 +1,7 @@
 import os
 from peewee import *
-
-from os import environ as env
-
 from crypto import *
 
-import os
-from peewee import *
-
-from os import environ as env
 
 
 # Initialize database connection as a global variable
@@ -26,9 +19,10 @@ class BaseModel(Model):
         database = db
 
 class Users(BaseModel):
-    user_id = CharField(primary_key=True)
-    email = CharField(unique=True)
+    user_id = AutoField(primary_key=True)
+    email = CharField()
     password = CharField()
+
 
 
 # Create tables if they do not exist
@@ -40,7 +34,7 @@ class Users(BaseModel):
 def drop_tables():
     with db:
         db.drop_tables([Users])
-
+#drop_tables()
 
 db.connect()
 db.create_tables([Users])
