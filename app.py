@@ -12,7 +12,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, send_from_directory
 from authlib.integrations.base_client.errors import OAuthError
 
 from Scanner.MicroQRCodeScanner import do_stuff
@@ -64,12 +64,12 @@ def main():
         session.pop('error')
     return render_template(
         "login.html",
-        session=session.get("user"),
-        pretty=json.dumps(session.get("user"), indent=4),
-        error=error,
+
     )
 
-
+        #session=session.get("user"),
+        #pretty=json.dumps(session.get("user"), indent=4),
+        #error=error,
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try: 
@@ -138,6 +138,7 @@ def homepage():
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
     return render_template('index.html', session = session.get("user"))
 
+
 # ==========================================================================
 # CREATING ENDPOINTS FOR USER REGISTRATION
 @app.route('/api/register', methods=['POST'])
@@ -172,6 +173,16 @@ def userLogin():
     
     try:
         user = Users.get(Users.email == email, Users.password == password)
+        
+        userinfo = {
+            "email": user.email
+        }
+
+        # Need to input session data appropriately
+        session["user"] = userinfo
+
+
+        return render_template('index.html')
         return {'message': 'User logged in successfully'}
     except Users.DoesNotExist:
         return {'message': 'User not found'}

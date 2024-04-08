@@ -4,17 +4,6 @@
     <title>Auth0 Example</title>
   </head>
   <body>
-    {% if session %}
-    <h1>Welcome {{session.userinfo.name}}!</h1>
-    <p><a href="/logout" id="qsLogoutBtn">Logout</a></p>
-    <div><pre>{{pretty}}</pre></div>
-    {% else %}
-    <h1 id="profileDropDown">Register Page</h1>
-    {% if error %}
-    <h3>{{error}}</h3>
-    {% endif %}
-    <p><a href="/login" id="qsLoginBtn">Login</a></p>
-    {% endif %}
 
 
     <br>

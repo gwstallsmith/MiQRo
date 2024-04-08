@@ -4,27 +4,7 @@
     <title>Auth0 Example</title>
   </head>
   <body>
-    {% if session %}
-    <h1>Welcome {{session.userinfo.name}}!</h1>
-    <p><a href="/logout" id="qsLogoutBtn">Logout</a></p>
-    <div><pre>{{pretty}}</pre></div>
-    {% else %}
-    <h1 id="profileDropDown">Login Page</h1>
-    {% if error %}
-    <h3>{{error}}</h3>
-    {% endif %}
-    <p><a href="/login" id="qsLoginBtn">Login</a></p>
-    {% endif %}
-
-
-    <br>
-    <!--
-    <label for="inputUsername">Username:</label>
-    <input type="text" id="inputUsername" name="username"><br>
-    <label for="inputUsername">Email:</label>
-    <input type="text" id="inputEmail" name="email" required><br>
-    <label for="inputPassword">Password:</label>
-    <input type="password" id="inputPassword" name="password" required><br>-->
+    <input type="password" id="inputPassword" name="password" required><br>
 
     <form id="user-create-form" action="/api/login" method="post" enctype="multipart/form-data">
       <!--<input class="form-control" type="text" id="name" name="name" placeholder="Your Name"><br>-->
