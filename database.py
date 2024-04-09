@@ -28,7 +28,7 @@ class Labs(BaseModel):
     lab_name = CharField()
 
 class Lab_Permissions(BaseModel):
-    user_id = ForeignKeyField(Users, backref="labs")
+    lab_user = ForeignKeyField(Users, backref="labs")
     lab_id = IntegerField()
     lab_admin = BooleanField()
 
@@ -54,8 +54,8 @@ class QRs(BaseModel):
 # Drop tables if they exist
 def drop_tables():
     with db:
-        db.drop_tables([Users])
-#drop_tables()
+        db.drop_tables([Labs, Lab_Permissions, Groups, QRs])
+drop_tables()
 
 db.connect()
 db.create_tables([Users, Labs, Lab_Permissions, Groups, QRs])
