@@ -1,22 +1,28 @@
 # LETS BUILD A DOCKER IMAGE
-FROM python:3.9-slim-buster
+FROM ubuntu:latest
 
-# Install system dependencies
-RUN apt-get update && \
+WORKDIR /microqr
+
+COPY . .
+
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends --quiet \
+        python3 \
+        python3-pip \
+    && apt-get clean all && \
+    apt-get install -y default-jre && \
     apt-get install -y libgl1-mesa-glx libglib2.0-0 &&  \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /microqr
 
 COPY requirements.txt .
 
 # Update pip
-RUN pip3 install --upgrade pip
+#RUN pip3 install --upgrade pip
 
 RUN pip3 install -r requirements.txt
 
-COPY . .
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
 
 EXPOSE 5000
