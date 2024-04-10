@@ -10,6 +10,7 @@ import base64
 import math
 import svgwrite
 import subprocess
+from collections import defaultdict
 
 #Get Image and Scanner Pathname
 #print("Image File")
@@ -49,6 +50,9 @@ def do_stuff(imgPath, output):
     start = time.time()
     #Read Image
     img = cv2.imread(imgpath)
+    print(img)
+    #assert img is not None, "Image not found"
+    assert img is not None, "Image not found"
     #show image
     imgX = img.shape[1]
     imgY = img.shape[0]
@@ -166,7 +170,7 @@ def do_stuff(imgPath, output):
     data = json.load(open(jsonPathTwo))
     jsonFile = open(jsonPath,"r+")
     oldData = json.load(jsonFile)
-    noMQRs = len(oldData["temp.jpg"])
+    noMQRs = len(oldData[imgpath])
     increment2 = 0
     for image_name, qr_codes in data.items():
         for qr_code_name, qr_code_data in qr_codes.items():
@@ -196,7 +200,7 @@ def do_stuff(imgPath, output):
                 #MQR = {"MicroQRCode"+str(increment2+noMQRs):[{"Data":newScan[increment2]},{"BoundingBox":[{"Point1":[{"x":coordinates2[0][0]},{"y":coordinates2[0][1]}]},{"Point2":[{"x":coordinates2[1][0]},{"y":coordinates2[1][1]}]},{"Point3":[{"x":coordinates2[2][0]},{"y":coordinates2[2][1]}]},{"Point4":[{"x":coordinates2[3][0]},{"y":coordinates2[3][1]}]}]}]}
                 MQR = {"Data":newScan[increment2],"BoundingBox":{"Point1":{"x":coordinates2[0][0],"y":coordinates2[0][1]},"Point2":{"x":coordinates2[1][0],"y":coordinates2[1][1]},"Point3":{"x":coordinates2[2][0],"y":coordinates2[2][1]},"Point4":{"x":coordinates2[3][0],"y":coordinates2[3][1]}}}
                 increment2 += 1
-                oldData["temp.jpg"]["MicroQRCode"+str(increment2+noMQRs)] = MQR
+                oldData[imgpath]["MicroQRCode"+str(increment2+noMQRs)] = MQR
                 ###Debug
                 #print(coordinates)
                 #print(coordinates2)
@@ -261,12 +265,16 @@ def create_svg(jsonData, output_path, image_path):
 
             #image name only without the extension
             image_name = image_name[:image_name.rfind(".")]
-            dwg = svgwrite.Drawing(os.path.join(output_path, f"{image_name.split('.')[0]}.svg"), size=image_size)
+            dwg = svgwrite.Drawing(os.path.join(output_path, f"temp.svg"), size=image_size)
 
             # Embed the image data in the SVG
             dwg.add(dwg.image(href=f"data:image/png;base64,{image_data}", insert=(0, 0), size=image_size))
 
+            id_map = dict()
+            coordinate_map = defaultdict(list)
+
             #Pulls the coordinates from the JSON file
+            index = 1
             for qr_code_name, qr_code_data in qr_codes.items():
                 if "BoundingBox" in qr_code_data:
                     bounding_box = qr_code_data["BoundingBox"]
@@ -277,7 +285,8 @@ def create_svg(jsonData, output_path, image_path):
                         (int(bounding_box["Point4"]["x"]), int(bounding_box["Point4"]["y"]))
                     ]
                     
-                    data_text = str(calculateDistance(qr_code_data.get("Data", ""),bounding_box,image_size))
+                    #data_text = str(calculateDistance(qr_code_data.get("Data", ""),bounding_box,image_size))
+                    data_text = str(index)
                     
                     #qr_code_data.get("Data", "")  # Get the data variable
 
@@ -290,9 +299,28 @@ def create_svg(jsonData, output_path, image_path):
                     # Add text to the SVG with the adjusted position
                     dwg.add(dwg.text(data_text, insert=(text_x, text_y),
                                      font_size=16, font_family="Arial", fill=svgwrite.rgb(255, 0, 0, '%')))
+                    
+                    #add coordiantes to coordinate map
+                    original_width, original_height = image_size
+                    new_width, new_height = (900,400)
+
+                    scale_x = new_width / original_width
+                    scale_y = new_height / original_height
+
+                    for c in coordinates :
+                        new_x = c[0] * scale_x
+                        new_y = c[1] * scale_y
+
+                        coordinate_map[index].append((new_x, new_y))
+
+
+                    
+                    # add ID and qr data to dict
+                    id_map[index] = qr_code_data["Data"]
+                    index += 1
 
             dwg.save()
-            return 'outputs/temp.svg'
+            return 'outputs/temp.svg', id_map, coordinate_map
 def calculateDistance(data,bb,size):
     r = 1#float(data)
     x1 = int(bb["Point1"]["x"])
