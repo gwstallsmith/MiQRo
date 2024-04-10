@@ -9,10 +9,33 @@
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="/static/styles.css" rel="stylesheet" />
+        <link href="static/styles.css" rel="stylesheet" />
+
+        <style>
+
+            #mySquare:hover {
+            fill: yellow; /* Change the fill color to yellow upon hover */
+            stroke: black; /* Add a black border upon hover */
+            stroke-width: 2; /* Specify the width of the border */
+            }
+        </style>
     </head>
     <body>
-        
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container px-5">
+                <a class="navbar-brand" href="#!">MicroQR</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">{{session.userinfo.name}}</a></li>
+                        <li><a href="/install_database">Install Database</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
         <h1>Image Upload</h1>
         {% if message %}
             <p>{{ message }}</p>
@@ -27,9 +50,30 @@
         {% endif %}
         <!-- Page Content-->
         <div class="container px-4 px-lg-5">
+            <h1>Dictionary Contents:</h1>
+            {% if ids %}
+            <ul>
+                {% for key, value in ids.items() %}
+                <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No dictionary available.</p>
+            {% endif %}
             <!-- Heading Row-->
             <div class="row gx-4 gx-lg-5 align-items-center my-5">
-                <div class="col-lg-7"> <img src="data:image/svg+xml;base64,{{ img }}" width="900" height="400"></div>
+                
+                <div class="col-lg-7">
+                     
+                    <img src="data:image/svg+xml;base64,{{ img }}" width="900" height="400" alt="Workplace" usemap="#mapname">
+                    {% if img %}
+                        <map name="mapname">
+                            {% for key, coordinates in squares.items() %}
+                            <area id="{{key}}" shape="poly" coords="{% for x, y in coordinates %}{{ x }},{{ y }}, {% endfor %}" href="{{key}}.html">
+                            {% endfor %}
+                        </map>
+                    {% endif %}
+                </div>
             </div>
             <!-- Call to Action-->
             <div class="card text-white bg-secondary my-5 py-4 text-center">
@@ -73,6 +117,6 @@
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
-        <script src="/static/scripts.js"></script>
+        <script src="static/scripts.js"></script>
     </body>
 </html>
