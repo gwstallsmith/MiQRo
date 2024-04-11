@@ -8,18 +8,20 @@
     <title>Create Lab</title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="static/styles.css" rel="stylesheet" />
+    <link href="/static/styles.css" rel="stylesheet" />
 </head>
 <body>
     <h1>Create Lab</h1>
     
-    <form>
-        <label for="labName">Lab Name:</label>
-        <input type="text" id="labName" name="labName"><br><br>
-        
+    <form id="user-create-form" action="/api/create_lab" method="post" enctype="multipart/form-data">
+        <label for="lab_name">Lab Name:</label>
+        <input class="form-control" type="text" id="lab_name" name="lab_name"><br><br>
+
+        <!--
+
         <label for="inviteEmails">Invite People:</label>
         <input type="text" id="inviteEmails" name="inviteEmails"><br><br>
-        
+        -->
         <button type="submit">Create Lab</button>
     </form>
     <footer class="py-5 bg-dark">
