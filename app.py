@@ -28,6 +28,8 @@ from os import environ as env
 from playhouse.shortcuts import model_to_dict
 from dotenv import load_dotenv
 
+import shutil
+
 load_dotenv()
 
 
