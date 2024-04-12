@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Lab Home</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/static/styles.css" rel="stylesheet" />
+    <style>
+        body{
+            font-size: min(max(16px, 3vw), 32px);
+            font-family:'Courier New', Courier, monospace;
+        }
+        .main{
+            display: flex;
+        }
+        div{
+            overflow: scroll;
+        }
+        li:hover, li.active {
+            background-color: #555;
+            color: white;
+        }
+        .navbar li, .sidebar ul li, tr, content ul {
+            cursor: pointer;
+        }
+        .navbar ul{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+        .navbar li {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            
+        } 
+        .sidebar{
+            max-height: 100vh; /* Adjust this value as needed */
+            overflow-y: auto;
+        }
+        .sidebar ul{
+            list-style-type: none;
+            width: 50%;
+            background-color: #f1f1f1;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden
+        }
+
+        .sidebar td:hover {
+            background-color: #555;
+            color: white;
+        }
+
+        li {
+            display: block;
+            color: #000;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+        .content{
+            margin-left: 25%;
+            padding: 1px 16px;
+            height: 100vh;
+            width: 20%;
+            cursor: pointer;
+        }
+        .content li{
+            overflow: auto;
+        }
+        .sidebar p, .content p {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            border: 1px solid #f1f1f1;
+            cursor: default;
+        }
+        #addCodesButton{
+            position: sticky;
+            bottom: 0;
+        }
+        div.details{
+            position: absolute; 
+            right: 10%; /* This will align the container to the right of the screen */
+            top: 50%; /* This will position the container halfway down the screen */
+        }
+        .scrollable-element {
+            overflow: auto;
+            padding-right: 20px; /* This will move the scrollbar 20px to the left */
+        }
+        .active {
+            background-color: #555;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <ul id="navbar">
+            <!-- Navbar items will be dynamically generated -->
+        </ul>
+    </div>
+    <div class = "main">
+        <div class="sidebar">
+            <p> Groups</p>
+            <!-- Sidebar items will be dynamically generated -->
+            <table id="sidebarTable"></table>
+             <!-- Add button below the sidebar -->
+            <button id="addGroupsButton">Add Groups</button>
+        </div>
+        
+        <div class="content">
+            <p>QR Codes</p>
+            <div class = "scrollable-content">
+                <!-- Content items will be dynamically generated -->
+                <ul id="contentList"></ul>
+            </div>
+            <!-- Add button below the content -->
+            <button id="addCodesButton">Add Codes</button>
+        </div>
+    </div>
+    <div class="details">
+        <!-- Details will be dynamically generated -->
+        <h2 id="detailsTitle"></h2>
+        <p id="detailsContent"></p>
+    </div>
+</body>
+</html>
+
+<script>
+    var navbarData = ['Lab 1', 'Lab 2', 'Lab 3'];
+    var sidebarData = {
+        'Lab 1': ['Group 1', 'Group 2', 'Group 3', 'Group 4',
+         'Group 5', 'Group 6', 'Group 7', 'Group 8', 'Group 9', 
+        'Group 10', 'Group 11', 'Group 12', 'Group 13', 
+        'Group 14', 'Group 15', 'Group 16', 'Group 17',
+         'Group 18', 'Group 19', 'Group 20', 'Group 21', 'Group 22',],
+        'Lab 2': ['Group 4', 'Group 5', 'Group 6'],
+        'Lab 3': ['Group 7', 'Group 8', 'Group 9']
+    };
+    var contentData = {
+        'Group 1': ['QR Code 1', 'QR Code 2', 'QR Code 3', 
+        'QR Code 4', 'QR Code 5', 'QR Code 6', 'QR Code 7', 'QR Code 8', 
+        'QR Code 9', 'QR Code 10', 'QR Code 11', 'QR Code 12', 'QR Code 13', 
+        'QR Code 14', 'QR Code 15', 'QR Code 16', 'QR Code 17', 
+        'QR Code 18', 'QR Code 19', 'QR Code 20'],
+        'Group 2': ['QR Code A', 'QR Code B', 'QR Code C'],
+        'Group 3': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 4': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 5': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 6': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 7': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 8': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        'Group 9': ['QR Code 1', 'QR Code 2', 'QR Code 3'],
+        // Add more groups and their corresponding QR codes as needed
+    };
+    var detailsData = {
+        'QR Code 1': 'QR code 1 details',
+        'QR Code 2': 'QR code 2 details',
+        'QR Code 3': 'QR code 3 details',
+        // Add more QR codes and their corresponding details as needed
+    };
+
+    var navbar = document.getElementById('navbar');
+    navbarData.forEach(function(item) {
+        var li = document.createElement('li');
+        li.textContent = item;
+        li.addEventListener('click', function() {
+            Array.from(navbar.children).forEach(function(child) {
+                child.classList.remove('active');
+            });
+            // Add the 'active' class to the clicked item
+            li.classList.add('active');
+            updateSidebar(item);
+        });
+        navbar.appendChild(li);
+    });
+
+    window.onload = function() {
+    updateSidebar(navbarData[0]);
+    updateContent(sidebarData[navbarData[0]][0]);
+    updateDetails(contentData[sidebarData[navbarData[0]][0]][0]);
+    };
+
+    function updateSidebar(lab) {
+        var sidebarTable = document.getElementById('sidebarTable');
+        sidebarTable.innerHTML = ''; // Clear the current table
+
+        sidebarData[lab].forEach(function(item) {
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.textContent = item;
+        td.addEventListener('click', function() {
+            Array.from(sidebarTable.getElementsByTagName('td')).forEach(function(child) {
+                child.classList.remove('active');
+            });
+
+            // Add the 'active' class to the clicked item
+            td.classList.add('active');
+            // Create a new button
+            var button = document.getElementById('activeGroupButton');
+            if (!button) {
+            // Create a new button
+                button = document.createElement('button');
+                button.id = 'activeGroupButton';
+                button.textContent = 'Set Active Group';
+
+                // Add an event listener to the button
+                button.addEventListener('click', function() {
+                    // Set the active group here
+                });
+
+                 // Append the button after the "Add Groups" button
+                var addGroupsButton = document.getElementById('addGroupsButton');
+                addGroupsButton.parentNode.insertBefore(button, addGroupsButton.nextSibling);
+            }
+            updateContent(item);
+        });
+        tr.appendChild(td);
+        sidebarTable.appendChild(tr);
+    });
+}
+
+    function updateContent(group) {
+        var contentList = document.getElementById('contentList');
+        contentList.innerHTML = ''; // Clear the current list
+
+        contentData[group].forEach(function(item) {
+            var li = document.createElement('li');
+            li.textContent = item;
+            li.addEventListener('click', function() {
+                Array.from(contentList.children).forEach(function(child) {
+                    child.classList.remove('active');
+                });
+
+                // Add the 'active' class to the clicked item
+                li.classList.add('active');
+                updateDetails(item);
+            });
+            contentList.appendChild(li);
+        });
+    }
+    
+    function updateDetails(qrCode) {
+        var detailsTitle = document.getElementById('detailsTitle');
+        var detailsContent = document.getElementById('detailsContent');
+
+        detailsTitle.textContent = qrCode;
+        detailsContent.textContent = detailsData[qrCode];
+    }
+   
+</script>
