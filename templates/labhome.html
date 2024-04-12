@@ -20,60 +20,60 @@
         div{
             overflow: scroll;
         }
-        div.navbar{
-            ul {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                background-color: #333;
-                }
-            li {
-                float: left;
-                display: block;
-                color: white;
-                text-align: center;
-                padding: 14px 16px;
-                text-decoration: none;
-                }
-            } 
+        li:hover, li.active {
+            background-color: #555;
+            color: white;
+        }
+        .navbar li, .sidebar ul li, tr, content ul {
+            cursor: pointer;
+        }
+        .navbar ul{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+        .navbar li {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            
+        } 
         .sidebar{
             max-height: 100vh; /* Adjust this value as needed */
             overflow-y: auto;
         }
-        div.sidebar{
-            ul {
-                list-style-type: none;
-                width: 40%;
-                background-color: #f1f1f1;
-                height: 100vh;
-                overflow-y: auto;
-                overflow-x: hidden
-            }
+        .sidebar ul{
+            list-style-type: none;
+            width: 50%;
+            background-color: #f1f1f1;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden
+        }
 
-            li {
+        .sidebar td:hover {
+            background-color: #555;
+            color: white;
+        }
+
+        li {
             display: block;
-                color: #000;
-                padding: 8px 16px;
-                text-decoration: none;
-            }
-
-            li.active {
-                background-color: #04AA6D;
-                color: white;
-            }
-
-            li:hover:not(.active) {
-                background-color: #555;
-                color: white;
-            }
+            color: #000;
+            padding: 8px 16px;
+            text-decoration: none;
         }
         .content{
             margin-left: 25%;
             padding: 1px 16px;
             height: 100vh;
             overflow: auto;
-            width: 60%
+            width: 20%;
+            cursor: pointer;
         }
         .scrollable-content{
             overflow-y: auto;
@@ -84,9 +84,13 @@
             bottom: 0;
         }
         div.details{
-            position: fixed; /* This will position the container relative to the viewport */
+            position: absolute; 
             right: 10%; /* This will align the container to the right of the screen */
             top: 50%; /* This will position the container halfway down the screen */
+        }
+        .scrollable-element {
+            overflow: auto;
+            padding-right: 20px; /* This will move the scrollbar 20px to the left */
         }
     </style>
 </head>
@@ -203,8 +207,5 @@
         detailsTitle.textContent = qrCode;
         detailsContent.textContent = detailsData[qrCode];
     }
-<<<<<<< HEAD
+   
 </script>
-=======
-</script>
->>>>>>> 0237b5956f00d812f0958c32db75fd341ac45150
