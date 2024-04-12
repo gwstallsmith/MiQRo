@@ -1,13 +1,48 @@
 import unittest
 from peewee import *
 
-from database import *
 
+test_db = SqliteDatabase(':memory:')
+
+class BaseModel(Model):
+    class Meta:
+        database = test_db
+
+class Users(BaseModel):
+    user_id = AutoField(primary_key=True)
+    email = CharField()
+    password = CharField()
+
+class Labs(BaseModel):
+    lab_id = AutoField(primary_key=True)
+    lab_name = CharField()
+
+class Lab_Permissions(BaseModel):
+    user_id = ForeignKeyField(Users, backref="labs")
+    lab_id = IntegerField()
+    lab_admin = BooleanField()
+
+class Groups(BaseModel):
+    lab_id = ForeignKeyField(Labs, backref="groups")
+    group_id = AutoField(primary_key=True)
+    group_name = CharField()
+
+class QRs(BaseModel):
+    qr_id = AutoField(primary_key=True)
+    group_id = ForeignKeyField(Groups, backref="qrs")
+    attr_0 = CharField()
+    attr_1 = CharField()
+    attr_2 = CharField()
+    attr_3 = CharField()
+    attr_4 = CharField()
+    attr_5 = CharField()
+    attr_6 = CharField()
+    attr_7 = CharField()
+    attr_8 = CharField()
+    attr_9 = CharField()
 
 MODELS = [Users, Labs, Lab_Permissions, Groups, QRs]
 
-
-test_db = SqliteDatabase(':memory:', pragmas={'foreign_keys': 1})
 
 class TestUserCreation(unittest.TestCase):
     def setUp(self):
@@ -21,9 +56,9 @@ class TestUserCreation(unittest.TestCase):
 
     def test_user_creation(self):
         first_user = Users.create(email='john@example.com', password='123456')
-        assert first_user.id == 1
+        assert first_user.user_id == 1
         second_user = Users.create(email='jane@example.com', password='1234567')
-        assert second_user.id == 2
+        assert second_user.user_id == 2
 
         users = Users.select()
 
