@@ -2,9 +2,9 @@ from flask import Flask, render_template, request
 from PIL import Image
 import io
 import tempfile
-import subprocess
 import os
 from peewee import *
+import re
 
 import json
 from os import environ as env
@@ -12,7 +12,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, send_from_directory
 from authlib.integrations.base_client.errors import OAuthError
 
 from Scanner.MicroQRCodeScanner import do_stuff
@@ -25,7 +25,10 @@ import os
 from peewee import *
 
 from os import environ as env
+from playhouse.shortcuts import model_to_dict
+from dotenv import load_dotenv
 
+load_dotenv()
 
 
 ENV_FILE = find_dotenv()
@@ -60,13 +63,13 @@ def main():
         error = session['error']
         session.pop('error')
     return render_template(
-        "home.html",
-        session=session.get("user"),
-        pretty=json.dumps(session.get("user"), indent=4),
-        error=error,
+        "login.html",
+
     )
 
-
+        #session=session.get("user"),
+        #pretty=json.dumps(session.get("user"), indent=4),
+        #error=error,
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try: 
@@ -84,6 +87,30 @@ def login():
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
+
+@app.route("/register")
+def register():
+    return render_template('register.html')
+
+@app.route("/labhome")
+def lab_home():
+    return render_template('labhome.html')
+
+@app.route("/labadd")
+def lab_add():
+    return render_template('labadd.html')
+
+@app.route("/labcreate")
+def lab_create():
+    return render_template('labcreate.html')
+
+@app.route("/creategroup")
+def create_group():
+    return render_template('creategroup.html')
+
+@app.route("/editdata")
+def edit_data():
+    return render_template('editdata.html')
 
 
 @app.route("/logout")
@@ -130,5 +157,126 @@ def homepage():
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
     return render_template('index.html', session = session.get("user"))
 
+
+# ==========================================================================
+# CREATING ENDPOINTS FOR USER REGISTRATION
+@app.route('/api/register', methods=['POST'])
+def postUserCreated():
+    email = request.form.get('email')
+    password = hash_password(request.form.get('password'))
+    if not email:
+        return {'error': 'Invalid email'}, 400
+    if not password:
+        return {'error': 'Invalid email'}, 400
+    
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
+
+
+    user = Users.create(email = email, password = password)
+    userinfo = {
+        "email": user.email,
+        "user_id": user.user_id
+    }
+    session["user"] = userinfo
+
+
+    return render_template('index.html')
+
+@app.route('/api/login', methods=['POST'])
+def userLogin():
+    email = request.form.get('email')
+    password = hash_password(request.form.get('password'))
+    if not email:
+        return {'error': 'Invalid email'}, 400
+    if not password:
+        return {'error': 'Invalid email'}, 400
+    
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
+    
+    try:
+        user = Users.get(Users.email == email, Users.password == password)
+        
+        userinfo = {
+            "email": user.email,
+            "user_id": user.user_id
+        }
+
+        # Need to input session data appropriately
+        session["user"] = userinfo
+
+
+        return render_template('index.html')
+        return {'message': 'User logged in successfully'}
+    except Users.DoesNotExist:
+        return {'message': 'User not found'}
+    
+
+
+@app.route('/api/user', methods=['GET'])
+def getUserCreated():
+   
+    users_created = [
+        model_to_dict(p)
+        for p in Users
+    ]
+
+    if not users_created:
+        return {'users_created': len(users_created)}
+
+    return {'users_created': users_created}
+
+
+@app.route('/api/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    try:
+        user = Users.get_by_id(user_id)
+        user.delete_instance()
+        return {'message': 'User deleted successfully'}
+    except Users.DoesNotExist:
+        return {'error': 'User with that id not found'}
+    
+@app.route('/api/labs/', methods=['GET'])
+def get_labs():
+    labs_created = [
+        model_to_dict(l)
+        for l in Labs
+    ]
+
+    if not labs_created:
+        return {'labs_create: ': len(labs_created)}
+    
+    return {'labs_create: ': labs_created}
+
+@app.route('/api/lab_permissions/', methods=['GET'])
+def get_lab_permissions():
+    lab_permissions_created = [
+        model_to_dict(p)
+        for p in Lab_Permissions
+    ]
+
+    if not lab_permissions_created:
+        return {'lab_permissions: ': len(lab_permissions_created)}
+    
+    return {'lab_permissions: ': lab_permissions_created}
+
+@app.route("/api/create_lab", methods=['GET', 'POST'])
+def create_lab():
+    lab_name = request.form.get('lab_name')
+
+    if not lab_name:
+        return {'error': 'Invalid lab name'}, 400
+
+    lab = Labs.create(lab_name = lab_name)
+
+    user_id = int(session.get('user').get('user_id'))
+
+    Lab_Permissions.create(lab_user = user_id, lab_id = lab.lab_id, lab_admin = True)
+    
+
+    return render_template('labhome.html')
+
+# ==========================================================================
 if __name__ == "__main__":
     app.run(debug=True)
