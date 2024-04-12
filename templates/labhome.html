@@ -97,6 +97,10 @@
             overflow: auto;
             padding-right: 20px; /* This will move the scrollbar 20px to the left */
         }
+        .active {
+            background-color: #555;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -171,6 +175,11 @@
         var li = document.createElement('li');
         li.textContent = item;
         li.addEventListener('click', function() {
+            Array.from(navbar.children).forEach(function(child) {
+                child.classList.remove('active');
+            });
+            // Add the 'active' class to the clicked item
+            li.classList.add('active');
             updateSidebar(item);
         });
         navbar.appendChild(li);
@@ -187,16 +196,39 @@
         sidebarTable.innerHTML = ''; // Clear the current table
 
         sidebarData[lab].forEach(function(item) {
-            var tr = document.createElement('tr');
-            var td = document.createElement('td');
-            td.textContent = item;
-            td.addEventListener('click', function() {
-                updateContent(item);
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.textContent = item;
+        td.addEventListener('click', function() {
+            Array.from(sidebarTable.getElementsByTagName('td')).forEach(function(child) {
+                child.classList.remove('active');
             });
-            tr.appendChild(td);
-            sidebarTable.appendChild(tr);
+
+            // Add the 'active' class to the clicked item
+            td.classList.add('active');
+            // Create a new button
+            var button = document.getElementById('activeGroupButton');
+            if (!button) {
+            // Create a new button
+                button = document.createElement('button');
+                button.id = 'activeGroupButton';
+                button.textContent = 'Set Active Group';
+
+                // Add an event listener to the button
+                button.addEventListener('click', function() {
+                    // Set the active group here
+                });
+
+                 // Append the button after the "Add Groups" button
+                var addGroupsButton = document.getElementById('addGroupsButton');
+                addGroupsButton.parentNode.insertBefore(button, addGroupsButton.nextSibling);
+            }
+            updateContent(item);
         });
-    }
+        tr.appendChild(td);
+        sidebarTable.appendChild(tr);
+    });
+}
 
     function updateContent(group) {
         var contentList = document.getElementById('contentList');
@@ -206,6 +238,12 @@
             var li = document.createElement('li');
             li.textContent = item;
             li.addEventListener('click', function() {
+                Array.from(contentList.children).forEach(function(child) {
+                    child.classList.remove('active');
+                });
+
+                // Add the 'active' class to the clicked item
+                li.classList.add('active');
                 updateDetails(item);
             });
             contentList.appendChild(li);
