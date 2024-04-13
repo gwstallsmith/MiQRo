@@ -105,7 +105,7 @@ def lab_create():
     return render_template('createlab.html')
 
 @app.route("/creategroup")
-def create_group():
+def render_create_group():
     return render_template('creategroup.html')
 
 @app.route("/editdata")
