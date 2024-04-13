@@ -55,7 +55,7 @@ class QRs(BaseModel):
 def drop_tables():
     with db:
         db.drop_tables([Labs, Lab_Permissions, Groups, QRs])
-drop_tables()
+#drop_tables()
 
 db.connect()
 db.create_tables([Users, Labs, Lab_Permissions, Groups, QRs])

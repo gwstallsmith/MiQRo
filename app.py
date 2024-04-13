@@ -96,16 +96,16 @@ def register():
 def lab_home():
     return render_template('labhome.html')
 
-@app.route("/labadd")
+@app.route("/addlab")
 def lab_add():
-    return render_template('labadd.html')
+    return render_template('addlab.html')
 
-@app.route("/labcreate")
+@app.route("/createlab")
 def lab_create():
-    return render_template('labcreate.html')
+    return render_template('createlab.html')
 
 @app.route("/creategroup")
-def create_group():
+def render_create_group():
     return render_template('creategroup.html')
 
 @app.route("/editdata")
@@ -155,7 +155,27 @@ def homepage():
                 encoded = base64.b64encode(data.encode()).decode()
 
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
-    return render_template('index.html', session = session.get("user"))
+    
+    labs_info = get_user_labs()
+
+    
+    return render_template('index.html', session = session.get("user"), labs_info = labs_info)
+
+#@app.route('/api/get_user_labs', methods=['GET'])
+def get_user_labs():
+    user = Users.select().where(Users.user_id == session.get("user").get("user_id"))
+    
+
+    lab_permissions = Lab_Permissions.select().where(Lab_Permissions.lab_user == user)
+    
+    lab_ids_query = Labs.select().where(Labs.lab_id.in_(lab_permissions))
+
+    # Convert query results to dictionaries
+    labs_info = [model_to_dict(lab) for lab in lab_ids_query]
+
+    return labs_info
+
+
 
 
 # ==========================================================================
@@ -207,8 +227,9 @@ def userLogin():
         session["user"] = userinfo
 
 
-        return render_template('index.html')
-        return {'message': 'User logged in successfully'}
+        labs_info = get_user_labs()
+        return render_template('index.html', session = session.get("user"), labs_info = labs_info)
+    
     except Users.DoesNotExist:
         return {'message': 'User not found'}
     
@@ -273,9 +294,53 @@ def create_lab():
     user_id = int(session.get('user').get('user_id'))
 
     Lab_Permissions.create(lab_user = user_id, lab_id = lab.lab_id, lab_admin = True)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": lab.lab_id
+    }
+
+    session["user"] = userinfo
     
 
     return render_template('labhome.html')
+
+@app.route("/api/create_group", methods=['GET', 'POST'])
+def create_group():
+
+    group_name = request.form.get('group_name')
+
+    if not group_name:
+        return {'error': 'Invalid group name'}, 400
+    
+    lab_id = session.get('user').get('lab_id')
+
+    group = Groups.create(lab_id = lab_id, group_name = group_name)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": session.get('lab_id'),
+        "group_id": group.group_id
+    }
+
+    session["user"] = userinfo
+
+    return render_template("labhome.html")
+
+
+@app.route("/api/groups", methods=['GET'])
+def get_groups():
+    groups_created = [
+        model_to_dict(g)
+        for g in Groups
+    ]
+
+    if not groups_created:
+        return {'groups_created: ': len(groups_created)}
+    
+    return {'groups_created: ': groups_created}
 
 # ==========================================================================
 if __name__ == "__main__":

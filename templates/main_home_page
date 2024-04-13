@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Navbar with TV-shaped Outer Container</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <style>
+    /* Custom CSS for TV-shaped outer container */
+    html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+    .tv-container {
+      position: relative;
+      width: 100%; /* Cover entire width of the page */
+      height: 100vh; /* Cover entire height of the viewport */
+      background-color: #333; /* Dark grey background */
+      overflow: hidden;
+      border-radius: 0; /* Square outer corners */
+    }
+
+    .tv-screen {
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      right: 5px;
+      bottom: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      background-color: #fff; /* White background for inner content */
+      border-radius: 20px; /* Rounded corners for inner content */
+      overflow: hidden;
+    }
+
+    /* White text for navbar items */
+    .navbar-nav .nav-link {
+      color: #333;
+    }
+
+    /* Padding for tab content */
+    .tab-content .tab-pane .content-wrapper {
+      padding-top: 10px; /* Top padding */
+      padding-bottom: 10px; /* Bottom padding */
+      padding-left: 15px; /* Left padding */
+      padding-right: 15px; /* Right padding */
+    }
+
+    .container {
+            align-items: stretch;
+            width: 100%;
+            height: 100vh;
+            min-width:100%;
+            position: relative;
+            display: flex;
+            padding: 0px;
+    }
+    
+    .left-space {
+            flex: 1.2;
+            background-color:white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            overflow-y: auto;
+            padding: 0px;
+            position: relative;
+    }
+        .left-space .app-bar {
+            position: sticky;
+            top: 0;
+            background-color: #F5F5F5;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            color: black;
+          
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 10px;
+            padding-top: 10px;
+            z-index: 1;
+        }
+        .left-space .content {
+            padding-top: 30px; /* Adjust padding to make space for the app bar */
+            padding-left: 2.5px; /* Add left padding for the content */
+            padding-right: 5px; /* Add right padding for the content */
+        }
+        .right-space {
+            flex: 1.8;
+            background-color: #FDFDFD;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            overflow-y: scroll;
+            position: relative;
+        }
+        .right-space .app-bar {
+            position: sticky;
+            top: 0;
+            background-color: #357EC7; /*#316FF6 #357EC7  #2F75B2  #357EC7;  */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            color: white;
+            padding: 20px;
+            
+            z-index: 1;
+        }
+        .right-space .content {
+            padding-top: 25px; /* Adjust padding to make space for the app bar */
+            padding-left: 20px; /* Add left padding for the content */
+            padding-right: 20px; /* Add right padding for the content */
+        }
+        .divider {
+            flex: 0 0 25px;
+            background-color: transparent;
+        }
+        .content-wrapper {
+          padding: 0px;
+        }
+        .card-text {
+         font-size: 15px;
+        }
+
+        .card-title {
+         font-weight: bold;
+        }
+
+        /* Define fade-in-up animation */
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Apply fade-in-up animation to list items */
+        .list-group-item {
+          animation: fade-in-up 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
+
+        /* Define fade-in-right animation */
+        @keyframes fade-in-right {
+          0% {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        /* Apply fade-in-right animation to the target text */
+        .fade-in-right {
+          animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
+        
+
+  </style>
+  <script src="group_choice_modal.js"></script>
+</head>
+<body>
+
+<div class="tv-container">
+  <div class="tv-screen">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand font-weight-bold" href="#">MiQR</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link home" href="#home">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Labs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Profile</a>
+          </li>
+          <!-- Add more nav items as needed -->
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Tab contents -->
+    <div class="tab-content">
+      <!-- Home Tab Content -->
+      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="content-wrapper">
+
+          <div class="spacer" style="width: 100%; height: 20px;"></div>   <!-- Welcome user -->
+          <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal"id="user_name">, </span></h2>
+          <script>
+            const username = "Percival,";
+            document.getElementById("user_name").innerHTML = username;
+          </script>
+          <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+          <div class="container">
+            <div class="left-space">
+                <div class="app-bar">
+                  <div class ="row justify-content-start" style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 0px;">
+                   
+                    <i class="bi bi-person-workspace" style="font-size: 18pt;" data-toggle="tooltip" data-placement="top" title="You currently regulate 5 Labs"></i>
+                    <div style="width: 20px;"></div>
+                    <i class="bi bi-qr-code-scan" style="font-size: 18pt;" data-toggle="tooltip" title="You are a member in 5 active Labs "></i>           
+                  
+                    <script>
+                      $(document).ready(function(){
+                        $('[data-toggle="tooltip"]').tooltip();
+                      });
+
+                    </script>
+                    
+                  </div>
+
+                </div>
+                <div class="content">
+                    <div style="height: 1000px;">
+                      <!-- Column card buttons -->
+                      <div class="column">
+                        <div class="card" style="width: 18rem;">
+                          <div class="card-body">
+                            <h5 class="card-title">Fetch QR Data</h5>
+                            <p class="card-text">
+                              Conveniently access stored laboratory data quickly from anywhere.
+                            </p>
+                            <!-- Button trigger choose group modal -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#chooseGroupModal" data-action="fetch" id="fetchButton">
+                              Fetch QR Code
+                            </button>
+
+                          </div>
+                        </div>
+
+                        <div class="spacer" style="width: 100%; height: 20px;"></div>
+
+                        <!-- Column card button, second-->
+                        <div class="card" style="width: 18rem;">
+                          <div class="card-body">
+                            <h5 class="card-title">Upload QR Data</h5>
+                            <p class="card-text">
+                              Transform and secure laboratory data to be safely stored away for any-time access.
+                            </p>
+    
+                            <!-- Button trigger choose group modal -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#chooseGroupModal" data-action="create" id="createButton">
+                              Upload QR Code
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="right-space">
+                <div class="app-bar">
+                    <p style="margin: 0; font-weight: bold;">Recent Activity</p>
+                </div>
+                <div class="content">
+                    <div style="height: 1000px;">
+
+                      
+                      <div class="fade-in-right">
+                        Scrollable Content, this is a sample list
+                      </div>
+
+                      <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+                      <ul class="list-group list-group-flush">
+                        <script>
+
+                          // Array containing the text for each list item
+                          const activityStack = [
+                            {action: "You created Biology Lab", icon: "bi bi-check2-square", time: "Today"},
+                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "Yesterday"},
+                            {action: "You created Physics Lab", icon: "bi bi-check2-square", time: "Yesterday"},
+                            {action: "You have been invited into Math Lab", icon: "bi bi-ui-checks", time: "This Week"},
+                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "This Week"},    
+                          ];
+
+                          // Loop through the activityStack array and generate list items dynamically
+                          activityStack.forEach(item => {
+                              document.write(`
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
+                                  <div class="d-flex align-items-center">
+                                  
+                                    <i class="${item.icon}" style="color: #999;"></i>
+                                    
+                                    <span style="margin-left: 20px; font-size: 14.5px;">${item.action}</span>
+                                  </div>
+                                  <span class="text-primary" style="font-size: small;">${item.time}</span>
+                                </li>
+                              `);
+                            });
+
+                        </script>
+                      </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+          <!-- Add more content here if needed -->
+        </div>
+      </div>
+
+      <!-- Add more tab contents here -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="chooseGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Let's choose a QR location</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+        <form id="grp-form">
+
+          <div class="form-group">
+            <label for="labSelect">Lab</label>
+            <!-- Dynamic lab select menu -->
+            <select class="form-control" id="labSelect" name="labSelect">
+              <option selected>Select a Lab</option>
+              <!-- Lab options will be dynamically populated here -->
+            </select>
+          </div>
+
+          
+          <div class="form-group">
+            <label for="grpSelect">Group</label>
+            
+            <select class="form-control" id="grpSelect" name="grpSelect">
+              <option selected>Select a Group</option>
+             
+            </select>
+          </div> 
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="startScanButton" class="btn btn-primary">Start Scan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body>
+</html>
