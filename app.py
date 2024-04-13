@@ -96,13 +96,13 @@ def register():
 def lab_home():
     return render_template('labhome.html')
 
-@app.route("/labadd")
+@app.route("/addlab")
 def lab_add():
-    return render_template('labadd.html')
+    return render_template('addlab.html')
 
-@app.route("/labcreate")
+@app.route("/createlab")
 def lab_create():
-    return render_template('labcreate.html')
+    return render_template('createlab.html')
 
 @app.route("/creategroup")
 def create_group():
@@ -276,6 +276,19 @@ def create_lab():
     
 
     return render_template('labhome.html')
+
+@app.route("/api/create_group", methods=['GET', 'POST'])
+def create_group():
+    return None
+
+
+@app.route("/api/groups", methods=['GET'])
+def get_groups():
+    groups_created = [
+        model_to_dict(g)
+        for g in Groups
+    ]
+    return None
 
 # ==========================================================================
 if __name__ == "__main__":
