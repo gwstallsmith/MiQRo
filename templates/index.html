@@ -25,6 +25,24 @@
                 <p>{{ error }}</p>
             {% endif %}
         {% endif %}
+        
+        <!-- Available labs -->
+        <body>
+            <h1>Lab Information</h1>
+            <ul>
+                {% if not labs_info %}
+                <pre> No Labs --- ADD CREATE LAB BUTTON </pre>
+                {% endif %}
+                {% for lab in labs_info %}
+                    <li>
+                        <h2>{{ lab.lab_name }}</h2>
+                        <p>{{ lab.lab_id }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </body>
+
+
         <!-- Page Content-->
         <div class="container px-4 px-lg-5">
             <!-- Heading Row-->

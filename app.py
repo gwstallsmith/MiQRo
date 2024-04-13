@@ -155,7 +155,27 @@ def homepage():
                 encoded = base64.b64encode(data.encode()).decode()
 
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
-    return render_template('index.html', session = session.get("user"))
+    
+    labs_info = get_user_labs()
+
+    
+    return render_template('index.html', session = session.get("user"), labs_info = labs_info)
+
+#@app.route('/api/get_user_labs', methods=['GET'])
+def get_user_labs():
+    user = Users.select().where(Users.user_id == session.get("user").get("user_id"))
+    
+
+    lab_permissions = Lab_Permissions.select().where(Lab_Permissions.lab_user == user)
+    
+    lab_ids_query = Labs.select().where(Labs.lab_id.in_(lab_permissions))
+
+    # Convert query results to dictionaries
+    labs_info = [model_to_dict(lab) for lab in lab_ids_query]
+
+    return labs_info
+
+
 
 
 # ==========================================================================
@@ -207,8 +227,9 @@ def userLogin():
         session["user"] = userinfo
 
 
-        return render_template('index.html')
-        return {'message': 'User logged in successfully'}
+        labs_info = get_user_labs()
+        return render_template('index.html', session = session.get("user"), labs_info = labs_info)
+    
     except Users.DoesNotExist:
         return {'message': 'User not found'}
     
