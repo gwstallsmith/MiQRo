@@ -28,6 +28,8 @@ from os import environ as env
 from playhouse.shortcuts import model_to_dict
 from dotenv import load_dotenv
 
+import shutil
+
 load_dotenv()
 
 
@@ -140,23 +142,18 @@ def homepage():
             image_bytes = file.read()
             image = Image.open(io.BytesIO(image_bytes))
             temp_dir = tempfile.mkdtemp()
-            temp_file_path = os.path.join(temp_dir, 'temp.jpg')
+            temp_file_path = os.path.join(temp_dir, 'temp.png')
             image.save(temp_file_path)
-            value = do_stuff(temp_file_path, "./outputs")
-           # java_command = f"java -jar ./applications.jar BatchScanMicroQrCodes -i {temp_file_path} -o output.json"
-           # result = subprocess.run(java_command, shell=True, capture_output=True)
-           # print(result.stdout)
-           # print(result.stderr)
+            img, ids, coordinate_map = do_stuff(temp_file_path, "./outputs")
 
             os.remove(temp_file_path)
-            os.rmdir(temp_dir)
+            shutil.rmtree(temp_dir, ignore_errors=True)
             with open('./outputs/temp.svg', 'r') as file:
                 data = file.read()
                 encoded = base64.b64encode(data.encode()).decode()
 
-            return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded)
+            return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map)
     return render_template('index.html', session = session.get("user"))
-
 
 # ==========================================================================
 # CREATING ENDPOINTS FOR USER REGISTRATION
