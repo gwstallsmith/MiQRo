@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Navbar with TV-shaped Outer Container</title>
+
+  <!-- Include the modal CSS -->
+  <link rel="stylesheet" href="modal.css">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Custom CSS for TV-shaped outer container */
+    html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+    .tv-container {
+      position: relative;
+      width: 100%; /* Cover entire width of the page */
+      height: 100vh; /* Cover entire height of the viewport */
+      background-color: #333; /* Dark grey background */
+      overflow: hidden;
+      border-radius: 0; /* Square outer corners */
+    }
+
+    .tv-screen {
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      right: 5px;
+      bottom: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      background-color: #fff; /* White background for inner content */
+      border-radius: 20px; /* Rounded corners for inner content */
+      overflow: hidden;
+    }
+
+    /* White text for navbar items */
+    .navbar-nav .nav-link {
+      color: #333;
+    }
+
+    /* Padding for tab content */
+    .tab-content .tab-pane .content-wrapper {
+      padding-top: 10px; /* Top padding */
+      padding-bottom: 10px; /* Bottom padding */
+      padding-left: 15px; /* Left padding */
+      padding-right: 15px; /* Right padding */
+    }
+
+    .container {
+            align-items: stretch;
+            width: 100%;
+            height: 100vh;
+            min-width:100%;
+            position: relative;
+            display: flex;
+            padding: 0px;
+    }
+    
+    .left-space {
+            flex: 1.2;
+            background-color:white;   /* entire height*/
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            overflow-y: auto;
+            padding: 0px;
+            position: relative;
+    }
+    .left-space .content {
+            padding-top: 15px; /* Adjust padding to make space for the app bar */
+            padding-left: 2.5px; /* Add left padding for the content */
+            padding-right: 20px; /* Add right padding for the content */
+            padding-bottom: 35px;
+            background-color: white;
+            height: 500px;
+    }
+    .right-space {
+            flex: 1.8;
+            background-color: #f8f9fa;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            overflow-y: scroll;
+            position: relative;
+    }
+
+    .right-space .app-bar {
+            position: sticky;
+            top: 0;
+            background-color: #fafbfc;
+            border-bottom: 1px solid #F5F5F5; /* Grey bottom border */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            color: black;
+            padding-top: 12.5px;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 5px;
+            z-index: 1;
+        }
+    
+    .right-space .content {
+            padding-top: 0px; /* Adjust padding to make space for the app bar */
+            padding-left: 12.5px; /* Add left padding for the content */
+            padding-right: 12.5px; /* Add right padding for the content */
+            background-color: #fafbfc; /**/
+    }
+    .divider {
+            flex: 0 0 25px;
+            background-color: transparent;
+    }
+    .content-wrapper {
+          padding: 0px;
+    }
+    .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .fade-in {
+    opacity: 0;
+    animation: fadeInAnimation 1s ease forwards;
+    }
+
+    @keyframes fadeInAnimation {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+
+
+  </style>
+  <script src="fetch.js" defer></script>
+</head>
+
+<body>
+<div class="tv-container">
+  <div class="tv-screen">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand font-weight-bold" href="#">MiQR</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link home" href="#home">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Labs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Profile</a>
+          </li>
+          <!-- Add more nav items as needed -->
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Tab contents -->
+    <div class="tab-content">
+      <!-- Home Tab Content -->
+      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="content-wrapper">
+
+          <div class="spacer" style="width: 100%; height: 25px;"></div>   <!-- Fetch Page -->
+          <h2 class="title" style="font-weight: bold;">Fetch QR Code</h2>
+          <div class="spacer" style="width: 100%; height: 15px;"></div>
+          
+          <div class="container">
+            <div class="left-space">
+                <div class="content">
+
+                    <div style="text-align: center;">
+
+                        <img src="data:image/svg+xml;base64,{{ img }}" width="500" height="500" style="border-radius: 10px; border: 2px solid darkgray;" usemap="#mapname">
+                        {% if img %}
+                        <map name="mapname">
+                            {% for key, coordinates in squares.items() %}
+                            <area id="{{key}}" shape="poly" coords="{% for x, y in coordinates %}{{ x }},{{ y }}, {% endfor %}" href="{{key}}.html">
+                            {% endfor %}
+                        </map>
+                        {% endif %}
+
+                        <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+                        <form method="POST" enctype="multipart/form-data">
+                            <input type="file" name="file" accept="image/*">
+                            <input type="submit" value="Upload">
+                        </form>
+
+                    </div>  
+                    
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="right-space" style="height: calc(100% - 240px);">
+                <div class="app-bar">
+                    <div class="row">
+  
+                        <h3 class="title" style="font-weight: bold;" id="microQR_ID"></h3>
+                      
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#defineModal">
+                          Launch edit
+                        </button>
+                    </div>
+                    
+                </div>
+
+                <div class="content" style="overflow-y: auto;">
+                    <div style="height: 1000px;">
+
+                        <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                          <div class="ms-2 me-auto">
+                              <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">QR ID</div>
+                              <span style="color: #111;" id="field1">test</span>
+                          </div></li>
+
+                        <!-- This displays a dynamic list for QR:Attributes. (key, pair) = (field-name, field-data) -->
+                        <!-- Display the selected lab Name here -->
+                        {% if qr_data %}
+                        {% for qr in qr_data %}
+                            <p id="formDataDisplay" class="fade-in" style="font-size: 12pt;">ID: {{qr.qr_id}}</p>
+                        {% endfor %}
+                        {% endif %}
+
+                    
+                        <div class="spacer" style="width: 100%; height: 0.5px;"></div>
+
+                        <ol class="list-group list-group-numbered fade-in">
+                          <!-- List items will be dynamically generated here -->
+                        </ol>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+          <!-- Add more content here if needed -->
+
+
+        </div>
+      </div>
+
+      <!-- Add more tab contents here -->
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="defineModal" tabindex="-1" role="dialog" aria-labelledby="defineModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="defineModalLabel">Define QR data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+
+    
+        <form id="dynamic-modal-form">
+          <div id="dynamic-form-fields"></div>
+        </form>
+       
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveData()">Save</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const microQR_ID = "Micro_QR_ID (a var)";
+document.getElementById("microQR_ID").innerHTML = microQR_ID;
+
+  // List of field names
+  // I NEED A FUNCTION TO DISPLAY FETCHED DATA, the original variable
+
+  function displayInitialData(listName) {
+    const dynamicListElement = document.querySelector('.list-group-numbered');
+
+    // Iterate over the simulated list and create list items
+    listName.forEach((item, index) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+        listItem.style.borderColor = '#f0f0f0';
+
+        const listItemContent = `
+            <div class="ms-2 me-auto">
+                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">${item.labelName}</div>
+                <span style="color: #111;" id="field${index + 1}">${item.input}</span>
+            </div>`;
+        
+        listItem.innerHTML = listItemContent;
+        dynamicListElement.appendChild(listItem);
+    });
+  }
+
+
+  const simList = [
+    { labelName: 'QR ID', input: "test" },
+    { labelName: 'Group', input: "test" },
+    { labelName: 'Attr 1', input: "test" },
+    { labelName: 'Attr 2', input: "test" },
+  ];
+
+  displayInitialData(simList);
+  
+
+  // Function to generate dynamic form fields. Backend data for each QR code is used here
+  // Function to generate dynamic form fields. Backend data for each QR code is used here
+function generateDynamicFormFields(listName) {
+    const dynamicFormFieldsContainer = document.getElementById('dynamic-form-fields');
+    dynamicFormFieldsContainer.innerHTML = '';
+
+    listName.forEach(item => {
+        const fieldId = item.labelName.replace(/\s+/g, '_').toLowerCase(); // Use item.labelName here
+        const labelName = item.labelName; // Store labelName
+
+        const formGroup = document.createElement('div');
+        formGroup.classList.add('form-group', 'row'); // Adding 'row' class
+
+        const labelColumn = document.createElement('div');
+        labelColumn.classList.add('col-md-3'); // Adjust width as needed
+        const label = document.createElement('label');
+        label.setAttribute('for', labelName); // Use labelName as for attribute
+        label.textContent = labelName;
+        label.style.fontWeight = 'bold';
+        labelColumn.appendChild(label);
+
+        const inputColumn = document.createElement('div');
+        inputColumn.classList.add('col-md-9'); // Adjust width as needed
+        const input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.classList.add('form-control');
+        // Used labelName NOT fieldId as id attribute
+        input.setAttribute('id', labelName); 
+        input.setAttribute('placeholder', `Enter ${labelName}`);
+        input.value = item.input; // Set input value from item.input
+        inputColumn.appendChild(input);
+
+        formGroup.appendChild(labelColumn);
+        formGroup.appendChild(inputColumn);
+        dynamicFormFieldsContainer.appendChild(formGroup);
+    });
+}
+
+  // Call the function initially to generate dynamic form fields
+  generateDynamicFormFields(simList);
+
+
+  // Function to handle form submission, form data updates original variables
+  function saveData() {
+   
+      // Create an object to store form data
+    const formDataObject = {};
+
+    // Retrieve all input elements within the form
+    const inputElements = document.querySelectorAll('#dynamic-modal-form input');
+
+    // Iterate over input elements and store their values in the object
+    inputElements.forEach(input => {
+        formDataObject[input.id] = input.value;
+    });
+    
+    // Convert the object to JSON
+    const formDataJSON = JSON.stringify(formDataObject);
+
+
+    // Display the JSON data as a dynamic list
+    const listElement = document.querySelector('.list-group-numbered');
+    listElement.innerHTML = ''; // Clear existing list items
+
+    // Iterate over the object properties and create list items
+    Object.entries(formDataObject).forEach(([key, value]) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+        listItem.style.borderColor = '#f0f0f0';
+
+        const listItemContent = `
+              <div class="ms-2 me-auto">
+                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">${key}</div>
+                <span style="color: #111;">${value}</span>
+              </div>`;
+            
+        
+        listItem.innerHTML = listItemContent;
+        listElement.appendChild(listItem);
+    });
+
+    
+    // Trigger alert for cross-checking form data
+    if (confirm('Are you set to upload the data?')) {
+        // Close the modal after saving
+          $('#defineModal').modal('hide');
+    }
+  }
+</script>
+
+
+
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>
