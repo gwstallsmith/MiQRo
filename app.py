@@ -273,13 +273,40 @@ def create_lab():
     user_id = int(session.get('user').get('user_id'))
 
     Lab_Permissions.create(lab_user = user_id, lab_id = lab.lab_id, lab_admin = True)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": lab.lab_id
+    }
+
+    session["user"] = userinfo
     
 
     return render_template('labhome.html')
 
 @app.route("/api/create_group", methods=['GET', 'POST'])
 def create_group():
-    return None
+
+    group_name = request.form.get('group_name')
+
+    if not group_name:
+        return {'error': 'Invalid group name'}, 400
+    
+    lab_id = session.get('user').get('lab_id')
+
+    group = Groups.create(lab_id = lab_id, group_name = group_name)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": session.get('lab_id'),
+        "group_id": group.group_id
+    }
+
+    session["user"] = userinfo
+
+    return render_template("labhome.html")
 
 
 @app.route("/api/groups", methods=['GET'])
@@ -288,7 +315,11 @@ def get_groups():
         model_to_dict(g)
         for g in Groups
     ]
-    return None
+
+    if not groups_created:
+        return {'groups_created: ': len(groups_created)}
+    
+    return {'groups_created: ': groups_created}
 
 # ==========================================================================
 if __name__ == "__main__":

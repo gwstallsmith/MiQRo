@@ -164,10 +164,10 @@
           <div class="spacer" style="width: 100%; height: 15px;"></div>
 <!-- create group page -->
             <h1>Create a new Group</h1>
-    <form>
-        <!-- group name input txtbox -->
-        <label for="groupName">Group Name:</label>
-        <input type="text" id="groupName" name="groupName" required>
+    <form id="group-create-form" action="/api/create_group" method="post" enctype="multipart/form-data">
+              <!-- group name input txtbox -->
+        <label for="group_name">Group Name:</label>
+        <input type="text" id="group_name" name="group_name" required>
         <br>
          <!-- color selector -->
         <label for="color">Color:</label>
