@@ -206,7 +206,8 @@
             <div class="right-space" style="height: calc(100% - 240px);">
                 <div class="app-bar">
                     <div class="row">
-                        <h3 class="title" style="font-weight: bold;">Micro_QR_ID</h3>
+  
+                        <h3 class="title" style="font-weight: bold;" id="microQR_ID"></h3>
                       
                         <!-- Button trigger modal -->
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#defineModal">
@@ -244,8 +245,6 @@
                         </script>
                     
                         <div class="spacer" style="width: 100%; height: 0.5px;"></div>
-
-                        <p id="displayForm"></p>
 
                         <ol class="list-group list-group-numbered fade-in">
                           <!-- List items will be dynamically generated here -->
@@ -299,51 +298,90 @@
 </div>
 
 <script>
+
+const microQR_ID = "Micro_QR_ID (a var)";
+document.getElementById("microQR_ID").innerHTML = microQR_ID;
+
   // List of field names
-  const fieldNames = ['Sample Name', 'Sample ID', 'External location', 'Recent tests', 'Created by'];
+  // I NEED A FUNCTION TO DISPLAY FETCHED DATA, the original variable
 
-  // Function to generate dynamic form fields. Backend data for each QR code is used here
-  function generateDynamicFormFields() {
-      const dynamicFormFieldsContainer = document.getElementById('dynamic-form-fields');
-      dynamicFormFieldsContainer.innerHTML = '';
+  const simList = [
+    { labelName: 'Sample Name', input: 'Long Text Generation by Modeling Sentence-Level and Discourse-Level Coherence' },
+    { labelName: 'Sample ID', input: 'To this end, we propose two pretraining objectives to learn the representations by predicting inter-sentence semantic similarity and distinguishing between normal and shuffled sentence orders.' },
+    { labelName: 'External location', input: 'https://ros2-industrial-workshop.readthedocs.io/en/latest/_source/navigation/ROS2-Navigation.html' },
+    { labelName: 'Recent tests', input: 'Generating long and coherent text is an important but challenging task, particularly for open-ended language generation tasks such as story generation. Despite the success in modeling intra-sentence coherence, existing generation models (e.g., BART) still struggle to maintain a coherent event sequence throughout the generated text. We conjecture that this is because of the difficulty for the decoder to capture the high-level semantics and discourse structures in the context beyond token-level co-occurrence.' },
+    { labelName: 'Created by', input: 'Omo Ajibola' }
+  ];
 
-      fieldNames.forEach(fieldName => {
-          const fieldId = fieldName.replace(/\s+/g, '_').toLowerCase();
+  function displayInitialData(listName) {
+    const dynamicListElement = document.querySelector('.list-group-numbered');
+    dynamicListElement.innerHTML = ''; // Clear existing list items
 
-          const formGroup = document.createElement('div');
-          formGroup.classList.add('form-group', 'row'); // Adding 'row' class
+    // Iterate over the simulated list and create list items
+    listName.forEach((item, index) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+        listItem.style.borderColor = '#f0f0f0';
 
-          const labelColumn = document.createElement('div');
-          labelColumn.classList.add('col-md-3'); // Adjust width as needed
-          const label = document.createElement('label');
-          label.setAttribute('for', fieldId);
-          label.textContent = fieldName;
-          labelColumn.appendChild(label);
-
-          const inputColumn = document.createElement('div');
-          inputColumn.classList.add('col-md-9'); // Adjust width as needed
-          const input = document.createElement('input');
-          input.setAttribute('type', 'text');
-          input.classList.add('form-control');
-          input.setAttribute('id', fieldId);
-          input.setAttribute('placeholder', `Enter ${fieldName}`);
-          inputColumn.appendChild(input);
-
-          formGroup.appendChild(labelColumn);
-          formGroup.appendChild(inputColumn);
-          dynamicFormFieldsContainer.appendChild(formGroup);
-      });
+        const listItemContent = `
+            <div class="ms-2 me-auto">
+                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">${item.labelName}</div>
+                <span style="color: #111;" id="field${index + 1}">${item.input}</span>
+            </div>`;
+        
+        listItem.innerHTML = listItemContent;
+        dynamicListElement.appendChild(listItem);
+    });
   }
 
-  // Call the function initially to generate dynamic form fields
-  generateDynamicFormFields();
+  displayInitialData(simList);
+  
 
-  // I NEED A FUNCTION TO DISPLAY FETCHED DATA, the original variables
-  function displayDataQR (){}
+  // Function to generate dynamic form fields. Backend data for each QR code is used here
+  // Function to generate dynamic form fields. Backend data for each QR code is used here
+function generateDynamicFormFields(listName) {
+    const dynamicFormFieldsContainer = document.getElementById('dynamic-form-fields');
+    dynamicFormFieldsContainer.innerHTML = '';
+
+    listName.forEach(item => {
+        const fieldId = item.labelName.replace(/\s+/g, '_').toLowerCase(); // Use item.labelName here
+        const labelName = item.labelName; // Store labelName
+
+        const formGroup = document.createElement('div');
+        formGroup.classList.add('form-group', 'row'); // Adding 'row' class
+
+        const labelColumn = document.createElement('div');
+        labelColumn.classList.add('col-md-3'); // Adjust width as needed
+        const label = document.createElement('label');
+        label.setAttribute('for', labelName); // Use labelName as for attribute
+        label.textContent = labelName;
+        label.style.fontWeight = 'bold';
+        labelColumn.appendChild(label);
+
+        const inputColumn = document.createElement('div');
+        inputColumn.classList.add('col-md-9'); // Adjust width as needed
+        const input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.classList.add('form-control');
+        // Used labelName NOT fieldId as id attribute
+        input.setAttribute('id', labelName); 
+        input.setAttribute('placeholder', `Enter ${labelName}`);
+        input.value = item.input; // Set input value from item.input
+        inputColumn.appendChild(input);
+
+        formGroup.appendChild(labelColumn);
+        formGroup.appendChild(inputColumn);
+        dynamicFormFieldsContainer.appendChild(formGroup);
+    });
+}
+
+  // Call the function initially to generate dynamic form fields
+  generateDynamicFormFields(simList);
+
 
   // Function to handle form submission, form data updates original variables
   function saveData() {
-      
+   
       // Create an object to store form data
     const formDataObject = {};
 
@@ -358,13 +396,29 @@
     // Convert the object to JSON
     const formDataJSON = JSON.stringify(formDataObject);
 
-    // Display the JSON data in an HTML element
-    const displayForm = document.getElementById('displayForm');
-    displayForm.innerText = formDataJSON;
 
+    // Display the JSON data as a dynamic list
+    const listElement = document.querySelector('.list-group-numbered');
+    listElement.innerHTML = ''; // Clear existing list items
 
-    // document.getElementById('displayForm').innerHTML = formDataJSON;
+    // Iterate over the object properties and create list items
+    Object.entries(formDataObject).forEach(([key, value]) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+        listItem.style.borderColor = '#f0f0f0';
 
+        const listItemContent = `
+              <div class="ms-2 me-auto">
+                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">${key}</div>
+                <span style="color: #111;">${value}</span>
+              </div>`;
+            
+        
+        listItem.innerHTML = listItemContent;
+        listElement.appendChild(listItem);
+    });
+
+    
     // Trigger alert for cross-checking form data
     if (confirm('Are you set to upload the data?')) {
         // Close the modal after saving

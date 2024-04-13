@@ -244,7 +244,7 @@
             <div class="right-space" style="height: calc(100% - 240px);">
                 <div class="app-bar">
                     <div class="row">
-                        <h3 class="title" style="font-weight: bold;">Micro_QR_ID</h3>
+                        <h3 class="title" style="font-weight: bold;" id="microQR_ID"></h3>
                       
                         <!-- Button trigger define modal -->
 
@@ -293,8 +293,10 @@
                     <div class="spacer" style="width: 100%; height: 40px;"></div>
 
                     <p style="text-align: center; font-family: monospace; font-size: 10pt;">
-                      Tip: When defining data for a QR code, consider using concise and relevant information. QR codes are most effective when they provide valuable information to users quickly and easily.
+                      Tip: When defining data for a QR code, consider using concise and relevant information. QR codes are most effective when they provide valuable information to you quickly and easily.
                     </p>
+
+                    <!-- <p id="demo"></p> -->
 
                     <script>
                       // Retrieve data from sessionStorage and set the form fields
@@ -362,16 +364,30 @@
 </div>
 
 <script>
-  // List of field names
-  const fieldNames = ['Sample Name', 'Sample ID', 'External location', 'Recent tests', 'Created by'];
 
-  // Function to generate dynamic form fields
-  function generateDynamicFormFields() {
+  // It seems, if you set and don't put in HTML, code beneath won't run
+  const microQR_ID = "Micro_QR_ID (a var)";
+  document.getElementById("microQR_ID").innerHTML = microQR_ID;
+
+  // List of field names
+  // I NEED A FUNCTION TO DISPLAY FETCHED DATA, the original variable
+
+  const simNewList = [
+    { labelName: 'Sample Name', input: '' },
+    { labelName: 'External location', input: '' },
+    { labelName: 'Tail width',input: '' },
+    { labelName: 'Tail lenght',input: '' },
+    { labelName: 'Created by', input: '' }
+  ];
+  
+
+  function generateDynamicFormFields(listName) {
       const dynamicFormFieldsContainer = document.getElementById('dynamic-form-fields');
       dynamicFormFieldsContainer.innerHTML = '';
 
-      fieldNames.forEach(fieldName => {
-          const fieldId = fieldName.replace(/\s+/g, '_').toLowerCase();
+      listName.forEach(item => {
+          const fieldId = item.labelName.replace(/\s+/g, '_').toLowerCase(); // Use item.labelName here
+          const labelName = item.labelName; // Store labelName
 
           const formGroup = document.createElement('div');
           formGroup.classList.add('form-group', 'row'); // Adding 'row' class
@@ -379,8 +395,9 @@
           const labelColumn = document.createElement('div');
           labelColumn.classList.add('col-md-3'); // Adjust width as needed
           const label = document.createElement('label');
-          label.setAttribute('for', fieldId);
-          label.textContent = fieldName;
+          label.setAttribute('for', labelName); // Use labelName as for attribute
+          label.textContent = labelName;
+          label.style.fontWeight = 'bold';
           labelColumn.appendChild(label);
 
           const inputColumn = document.createElement('div');
@@ -388,8 +405,10 @@
           const input = document.createElement('input');
           input.setAttribute('type', 'text');
           input.classList.add('form-control');
-          input.setAttribute('id', fieldId);
-          input.setAttribute('placeholder', `Enter ${fieldName}`);
+          // Used labelName NOT fieldId as id attribute
+          input.setAttribute('id', labelName); 
+          input.setAttribute('placeholder', `Enter ${labelName}`);
+          input.value = item.input; // Set input value from item.input
           inputColumn.appendChild(input);
 
           formGroup.appendChild(labelColumn);
@@ -399,15 +418,35 @@
   }
 
   // Call the function initially to generate dynamic form fields
-  generateDynamicFormFields();
+  generateDynamicFormFields(simNewList);
 
   // Function to handle form submission
   function uploadData() {
-      // Example: You can collect form data here and process it further
-      const formData = new FormData(document.getElementById('dynamic-modal-form'));
-      for (const [key, value] of formData.entries()) {
-          console.log(key + ': ' + value);
-      }
+
+      // Create an object to store form data
+      const formDataObject = {};
+
+      // Retrieve all input elements within the form
+      const inputElements = document.querySelectorAll('#dynamic-modal-form input');
+
+      // Iterate over input elements and store their values in the object
+      inputElements.forEach(input => {
+          formDataObject[input.id] = input.value;
+      });
+      
+      // Convert the object to JSON
+      const formDataJSON = JSON.stringify(formDataObject);
+
+      // Iterate over the object properties and update .input(value) of each list item
+      Object.entries(formDataObject).forEach(([key, value]) => {
+          const matchingItem = simNewList.find(item => item.labelName === key);
+          if (matchingItem) {
+              matchingItem.input = value;
+          }
+      });
+
+      // THIS DISPLAYS UPDATED .input : update MIQR attributes with .input
+      // document.getElementById("demo").innerHTML = JSON.stringify(simNewList, null, 2);
 
       // Trigger alert for cross-checking form data
       if (confirm('Are you set to upload the data?')) {

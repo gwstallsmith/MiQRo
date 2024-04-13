@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bootstrap Navbar with TV-shaped Outer Container</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+ 
   <style>
     /* Custom CSS for TV-shaped outer container */
     html, body {
@@ -78,7 +79,11 @@
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
             color: black;
-            padding: 20px; /* Adjusted padding */
+          
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 10px;
+            padding-top: 10px;
             z-index: 1;
         }
         .left-space .content {
@@ -102,6 +107,7 @@
             border-top-right-radius: 10px;
             color: white;
             padding: 20px;
+            
             z-index: 1;
         }
         .right-space .content {
@@ -124,11 +130,43 @@
          font-weight: bold;
         }
 
+        /* Define fade-in-up animation */
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
+        /* Apply fade-in-up animation to list items */
+        .list-group-item {
+          animation: fade-in-up 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
 
+        /* Define fade-in-right animation */
+        @keyframes fade-in-right {
+          0% {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        /* Apply fade-in-right animation to the target text */
+        .fade-in-right {
+          animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
+        
 
   </style>
-  <script src="test.js"></script>
+  <script src="group_choice_modal.js"></script>
 </head>
 <body>
 
@@ -164,13 +202,31 @@
         <div class="content-wrapper">
 
           <div class="spacer" style="width: 100%; height: 20px;"></div>   <!-- Welcome user -->
-          <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal">Youthere,</span></h2>
+          <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal"id="user_name">, </span></h2>
+          <script>
+            const username = "Percival,";
+            document.getElementById("user_name").innerHTML = username;
+          </script>
           <div class="spacer" style="width: 100%; height: 15px;"></div>
 
           <div class="container">
             <div class="left-space">
                 <div class="app-bar">
-                    <p style="margin: 0; font-weight: bold;">Icon and Icon</p>
+                  <div class ="row justify-content-start" style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 0px;">
+                   
+                    <i class="bi bi-person-workspace" style="font-size: 18pt;" data-toggle="tooltip" data-placement="top" title="You currently regulate 5 Labs"></i>
+                    <div style="width: 20px;"></div>
+                    <i class="bi bi-qr-code-scan" style="font-size: 18pt;" data-toggle="tooltip" title="You are a member in 5 active Labs "></i>           
+                  
+                    <script>
+                      $(document).ready(function(){
+                        $('[data-toggle="tooltip"]').tooltip();
+                      });
+
+                    </script>
+                    
+                  </div>
+
                 </div>
                 <div class="content">
                     <div style="height: 1000px;">
@@ -219,52 +275,41 @@
                 </div>
                 <div class="content">
                     <div style="height: 1000px;">
-                      Scrollable Content, this is a sample list
+
+                      
+                      <div class="fade-in-right">
+                        Scrollable Content, this is a sample list
+                      </div>
 
                       <div class="spacer" style="width: 100%; height: 15px;"></div>
 
                       <ul class="list-group list-group-flush">
                         <script>
-                          // Array containing the text for the far end of each list item
-                          const timeArray = ["Today", "Tomorrow", "Yesterday", "This Week", "Last Week"];
 
                           // Array containing the text for each list item
-                          const textForListItems = [
-                            "You created Lab: Biology_lab",
-                            "You have been removed from Chemistry_lab",
-                            "You created Lab: Physics_lab",
-                            "You have been added to Computer_lab",
-                            "You have been added to Math_lab"
+                          const activityStack = [
+                            {action: "You created Biology Lab", icon: "bi bi-check2-square", time: "Today"},
+                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "Yesterday"},
+                            {action: "You created Physics Lab", icon: "bi bi-check2-square", time: "Yesterday"},
+                            {action: "You have been invited into Math Lab", icon: "bi bi-ui-checks", time: "This Week"},
+                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "This Week"},    
                           ];
 
-                          // Array containing the class names of icons
-                          const iconArray = ["fas fa-folder-open", "fas fa-bell", "fas fa-envelope"];
+                          // Loop through the activityStack array and generate list items dynamically
+                          activityStack.forEach(item => {
+                              document.write(`
+                                <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
+                                  <div class="d-flex align-items-center">
+                                  
+                                    <i class="${item.icon}" style="color: #999;"></i>
+                                    
+                                    <span style="margin-left: 20px; font-size: 14.5px;">${item.action}</span>
+                                  </div>
+                                  <span class="text-primary" style="font-size: small;">${item.time}</span>
+                                </li>
+                              `);
+                            });
 
-                          // Function to randomly select an icon class from the iconArray
-                          function getRandomIcon() {
-                            const randomIndex = Math.floor(Math.random() * iconArray.length);
-                            return iconArray[randomIndex];
-                          }
-
-                         // Function to get the text for each list item based on the current index
-                          function getTextForListItem(index) {
-                            return textForListItems[index % textForListItems.length];
-                          }
-                      
-                          // Loop through the textArray and generate list items dynamically
-                          timeArray.forEach((text, index) => {
-                            const randomIcon = getRandomIcon();
-                            const textForListItem = getTextForListItem(index);
-                            document.write(`
-                              <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
-                                <div class="d-flex align-items-center">
-                                  <i class="${randomIcon}" style="color: #999;"></i>
-                                  <span style="margin-left: 20px; font-size: 14.5px;">${textForListItem}</span>
-                                </div>
-                                <span class="text-primary" style="font-size: small;">${text}</span>
-                              </li>
-                            `);
-                          });
                         </script>
                       </ul>
 
@@ -330,6 +375,8 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
 
 
 </body>
