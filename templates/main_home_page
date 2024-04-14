@@ -106,7 +106,11 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             color: white;
-            padding: 20px;
+      
+            padding-left: 30px;
+            padding-right: 25px;
+            padding-top: 15px;
+            padding-bottom: 10px;
             
             z-index: 1;
         }
@@ -271,7 +275,12 @@
             <div class="divider"></div>
             <div class="right-space">
                 <div class="app-bar">
-                    <p style="margin: 0; font-weight: bold;">Recent Activity</p>
+                  <div class="row justify-content-between">
+                    <p style="margin: 0; font-weight: bold;">My Labs</p>
+                  
+                    <a href="page_url_here" class="btn btn-light" style="margin-right: 5px; font-size: 10pt;">Go to Labs</a>
+                  </div>
+                    
                 </div>
                 <div class="content">
                     <div style="height: 1000px;">
@@ -287,31 +296,34 @@
                         <script>
 
                           // Array containing the text for each list item
-                          const activityStack = [
-                            {action: "You created Biology Lab", icon: "bi bi-check2-square", time: "Today"},
-                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "Yesterday"},
-                            {action: "You created Physics Lab", icon: "bi bi-check2-square", time: "Yesterday"},
-                            {action: "You have been invited into Math Lab", icon: "bi bi-ui-checks", time: "This Week"},
-                            {action: "You uploaded a QR code", icon: "bi bi-qr-code-scan", time: "This Week"},    
+                          const userLabs = [
+                            {name: "Biology Lab", grpCnt: 12},
+                            {name: "Quant Lab", grpCnt: 102},
+                            {name: "Chem Lab", grpCnt: 108},
+                            {name: "Organic Chem Lab", grpCnt: 104},
+                            {name: "Another Lab", grpCnt: 10},
                           ];
 
                           // Loop through the activityStack array and generate list items dynamically
-                          activityStack.forEach(item => {
+                          userLabs.forEach(item => {
                               document.write(`
                                 <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
                                   <div class="d-flex align-items-center">
                                   
-                                    <i class="${item.icon}" style="color: #999;"></i>
+                                    <i class="bi bi-qr-code-scan" style="color: #999;"></i>
                                     
-                                    <span style="margin-left: 20px; font-size: 14.5px;">${item.action}</span>
+                                    <span style="margin-left: 20px; font-size: 14.5px;">${item.name}</span>
                                   </div>
-                                  <span class="text-primary" style="font-size: small;">${item.time}</span>
+                                  <span class="badge badge-pill badge-light text-primary">${item.grpCnt}</span>
                                 </li>
                               `);
                             });
 
                         </script>
                       </ul>
+
+            
+                      
 
                     </div>
                 </div>
@@ -381,3 +393,4 @@
 
 </body>
 </html>
+
