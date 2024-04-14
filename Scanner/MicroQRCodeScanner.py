@@ -250,6 +250,7 @@ def calculate_text_position(coordinates, text, font_size, spacing):
     return new_x, new_y
 
 
+# noinspection PyPackageRequirements
 def create_svg(jsonData, output_path, image_path):
     #print("JSON FILE", jsonFile)
     #with open(jsonFile, 'r') as json_file:
@@ -294,7 +295,8 @@ def create_svg(jsonData, output_path, image_path):
                     text_x, text_y = calculate_text_position(coordinates, data_text, font_size=16, spacing=10)
 
                     # Add a polygon to the SVG
-                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(255, 0, 0, '%'), fill='none'))
+                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(205, 0, 0, '%'), fill='none',
+                                        ))
 
                     # Add text to the SVG with the adjusted position
                     dwg.add(dwg.text(data_text, insert=(text_x, text_y),

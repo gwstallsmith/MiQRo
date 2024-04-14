@@ -98,6 +98,25 @@ def login():
 def register():
     return render_template('register.html')
 
+@app.route("/labhome")
+def lab_home():
+    return render_template('labhome.html')
+
+@app.route("/addlab")
+def lab_add():
+    return render_template('addlab.html')
+
+@app.route("/createlab")
+def lab_create():
+    return render_template('createlab.html')
+
+@app.route("/creategroup")
+def render_create_group():
+    return render_template('creategroup.html')
+
+@app.route("/editdata")
+def edit_data():
+    return render_template('editdata.html')
 
 
 @app.route("/logout")
@@ -267,8 +286,13 @@ def postUserCreated():
         return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
 
 
-    user_created = Users.create(email = email, password = password)
-    
+    user = Users.create(email = email, password = password)
+    userinfo = {
+        "email": user.email,
+        "user_id": user.user_id
+    }
+    session["user"] = userinfo
+
 
     return render_template('index.html')
 
@@ -288,7 +312,8 @@ def userLogin():
         user = Users.get(Users.email == email, Users.password == password)
         
         userinfo = {
-            "email": user.email
+            "email": user.email,
+            "user_id": user.user_id
         }
 
         # Need to input session data appropriately
@@ -324,6 +349,78 @@ def delete_user(user_id):
         return {'message': 'User deleted successfully'}
     except Users.DoesNotExist:
         return {'error': 'User with that id not found'}
+    
+@app.route('/api/labs/', methods=['GET'])
+def get_labs():
+    labs_created = [
+        model_to_dict(l)
+        for l in Labs
+    ]
+
+    if not labs_created:
+        return {'labs_create: ': len(labs_created)}
+    
+    return {'labs_create: ': labs_created}
+
+@app.route('/api/lab_permissions/', methods=['GET'])
+def get_lab_permissions():
+    lab_permissions_created = [
+        model_to_dict(p)
+        for p in Lab_Permissions
+    ]
+
+    if not lab_permissions_created:
+        return {'lab_permissions: ': len(lab_permissions_created)}
+    
+    return {'lab_permissions: ': lab_permissions_created}
+
+@app.route("/api/create_lab", methods=['GET', 'POST'])
+def create_lab():
+    lab_name = request.form.get('lab_name')
+
+    if not lab_name:
+        return {'error': 'Invalid lab name'}, 400
+
+    lab = Labs.create(lab_name = lab_name)
+
+    user_id = int(session.get('user').get('user_id'))
+
+    Lab_Permissions.create(lab_user = user_id, lab_id = lab.lab_id, lab_admin = True)
+    
+
+    return render_template('labhome.html')
+
+@app.route("/api/create_group", methods=['GET', 'POST'])
+def create_group():
+
+    group_name = request.form.get('group_name')
+
+    if not group_name:
+        return {'error': 'Invalid group name'}, 400
+    
+    lab_id = session.get('user').get('lab_id')
+
+    group = Groups.create(lab_id = lab_id, group_name = group_name)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": session.get('lab_id'),
+        "group_id": group.group_id
+    }
+
+    session["user"] = userinfo
+
+    return render_template("labhome.html")
+
+@app.route("/api/groups", methods=['GET'])
+def get_groups():
+    groups_created = [
+        model_to_dict(g)
+        for g in Groups
+    ]
+    return None
+
 # ==========================================================================
 if __name__ == "__main__":
     app.run(debug=True)
