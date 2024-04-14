@@ -9,6 +9,8 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/static/styles.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">  
     <style>
         html, body {
             margin: 0;
@@ -84,7 +86,7 @@
         }
         .right-space {
             flex: 1.8;
-            background-color: #FDFDFD;
+            background-color: #e12929;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             overflow-y: scroll;
@@ -126,7 +128,7 @@
             overflow: scroll;
         }
         li:hover, li.active {
-            background-color: #555;
+            background-color: #222;
             color: white;
         }
         .navbar li, .sidebar ul li, tr, content ul {
@@ -137,17 +139,17 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #333;
+            background-color: #222;
         }
         .navbar li {
             float: left;
-            display: block;
-            color: white;
+            color: #333;
             text-align: center;
-            padding: 14px 16px;
             text-decoration: none;
-            
         } 
+        .navbar li:hover {
+            color: white;
+        }
         .sidebar{
             max-height: 100vh; /* Adjust this value as needed */
             overflow-y: auto;
@@ -162,12 +164,11 @@
         }
 
         .sidebar td:hover {
-            background-color: #555;
+            background-color: #333;
             color: white;
         }
 
         li {
-            display: block;
             color: #000;
             padding: 8px 16px;
             text-decoration: none;
@@ -182,12 +183,16 @@
         .content li{
             overflow: auto;
         }
+        .content li:hover {
+            background-color: #333;
+            color: white;
+        }
         .sidebar p, .content p {
             position: sticky;
             top: 0;
             background: white;
             z-index: 1;
-            border: 1px solid #f1f1f1;
+            border: 1px solid #333;
             cursor: default;
         }
         #addCodesButton{
@@ -204,41 +209,87 @@
             padding-right: 20px; /* This will move the scrollbar 20px to the left */
         }
         .active {
-            background-color: #555;
             color: white;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <ul id="navbar">
-            <!-- Navbar items will be dynamically generated -->
-        </ul>
-    </div>
-    <div class = "main">
-        <div class="sidebar">
-            <p> Groups</p>
-            <!-- Sidebar items will be dynamically generated -->
-            <table id="sidebarTable"></table>
-             <!-- Add button below the sidebar -->
-            <button id="addGroupsButton">Add Groups</button>
-        </div>
-        
-        <div class="content">
-            <p>QR Codes</p>
-            <div class = "scrollable-content">
-                <!-- Content items will be dynamically generated -->
-                <ul id="contentList"></ul>
+    <div class="tv-container">
+        <div class="tv-screen">
+          <!-- Navbar -->
+          <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand font-weight-bold" href="#">MiQRo</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+      
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link home" href="#home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Labs</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Profile</a>
+                </li>
+                <!-- Add more nav items as needed -->
+              </ul>
             </div>
-            <!-- Add button below the content -->
-            <button id="addCodesButton">Add Codes</button>
+          </nav>
+      
+          <!-- Tab contents -->
+          <div class="tab-content">
+            <!-- Home Tab Content -->
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+              <div class="content-wrapper">
+      
+                <div class="spacer" style="width: 100%; height: 20px;"></div>   <!-- Welcome user -->
+                <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal">Youthere,</span></h2>
+                <div class="spacer" style="width: 100%; height: 15px;"></div>
+      
+                <div class="navbar">
+                    <ul id="navbar">
+                        <!-- Navbar items will be dynamically generated -->
+                    </ul>
+                </div>
+                <div class = "main">
+                    <div class="sidebar">
+                        <p> Groups</p>
+                        <!-- Sidebar items will be dynamically generated -->
+                        <table id="sidebarTable"></table>
+                         <!-- Add button below the sidebar -->
+                        <button id="addGroupsButton">Add Groups</button>
+                    </div>
+                    
+                    <div class="content">
+                        <p>QR Codes</p>
+                        <div class = "scrollable-content">
+                            <!-- Content items will be dynamically generated -->
+                            <ul id="contentList"></ul>
+                        </div>
+                        <!-- Add button below the content -->
+                        <button id="addCodesButton">Add Codes</button>
+                    </div>
+                </div>
+                <div class="details">
+                    <!-- Details will be dynamically generated -->
+                    <h2 id="detailsTitle"></h2>
+                    <p id="detailsContent"></p>
+                </div>
+      
+            <!-- Add more tab contents here -->
+          </div>
         </div>
-    </div>
-    <div class="details">
-        <!-- Details will be dynamically generated -->
-        <h2 id="detailsTitle"></h2>
-        <p id="detailsContent"></p>
-    </div>
+      </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="group_choice_modal.js"></script> <!-- this is group_choice_modal -->
+
+
 </body>
 </html>
 
