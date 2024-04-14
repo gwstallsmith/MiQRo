@@ -111,7 +111,7 @@ def lab_create():
     return render_template('createlab.html')
 
 @app.route("/creategroup")
-def create_group():
+def render_create_group():
     return render_template('creategroup.html')
 
 @app.route("/editdata")
@@ -355,8 +355,26 @@ def create_lab():
 
 @app.route("/api/create_group", methods=['GET', 'POST'])
 def create_group():
-    return None
 
+    group_name = request.form.get('group_name')
+
+    if not group_name:
+        return {'error': 'Invalid group name'}, 400
+    
+    lab_id = session.get('user').get('lab_id')
+
+    group = Groups.create(lab_id = lab_id, group_name = group_name)
+
+    userinfo = {
+        "email": session.get('email'),
+        "user_id": session.get('user_id'),
+        "lab_id": session.get('lab_id'),
+        "group_id": group.group_id
+    }
+
+    session["user"] = userinfo
+
+    return render_template("labhome.html")
 
 @app.route("/api/groups", methods=['GET'])
 def get_groups():
