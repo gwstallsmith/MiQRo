@@ -304,7 +304,7 @@ def create_svg(jsonData, output_path, image_path):
                     
                     #add coordiantes to coordinate map
                     original_width, original_height = image_size
-                    new_width, new_height = (900,400)
+                    new_width, new_height = (500,500)
 
                     scale_x = new_width / original_width
                     scale_y = new_height / original_height
@@ -313,7 +313,7 @@ def create_svg(jsonData, output_path, image_path):
                         new_x = c[0] * scale_x
                         new_y = c[1] * scale_y
 
-                        coordinate_map[index].append((new_x, new_y))
+                        coordinate_map[qr_code_data["Data"].lstrip('0')].append((new_x, new_y))
 
 
                     

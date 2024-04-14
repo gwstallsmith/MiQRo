@@ -3,14 +3,17 @@ from peewee import *
 from crypto import *
 
 
-
-# Initialize database connection as a global variable
-db =  MySQLDatabase(os.getenv("MYSQL_DATABASE"),
-        user = os.getenv("MYSQL_USER"),
-        password = os.getenv("MYSQL_PASSWORD"),
-        host = os.getenv("MYSQL_HOST"),
-        port = 3306
-)
+if os.getenv("TESTING") == "true":
+    print("Running in test mode")
+    mydb = SqliteDatabase('file:memory?mode=memory&cache=shared', uri=True)
+else:
+    # Initialize database connection as a global variable
+    db =  MySQLDatabase(os.getenv("MYSQL_DATABASE"),
+            user = os.getenv("MYSQL_USER"),
+            password = os.getenv("MYSQL_PASSWORD"),
+            host = os.getenv("MYSQL_HOST"),
+            port = 3306
+    )
 
 print(db)
 
@@ -28,7 +31,7 @@ class Labs(BaseModel):
     lab_name = CharField()
 
 class Lab_Permissions(BaseModel):
-    lab_user = ForeignKeyField(Users, backref="labs")
+    user_id = ForeignKeyField(Users, backref="labs")
     lab_id = IntegerField()
     lab_admin = BooleanField()
 
@@ -39,7 +42,7 @@ class Groups(BaseModel):
 
 class QRs(BaseModel):
     qr_id = AutoField(primary_key=True)
-    group_id = ForeignKeyField(Groups, backref="qrs")
+    group_id = CharField()
     attr_0 = CharField()
     attr_1 = CharField()
     attr_2 = CharField()

@@ -145,6 +145,7 @@
 
   </style>
   <script src="fetch.js" defer></script>
+  
 </head>
 
 <body>
@@ -160,7 +161,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link home" href="#home">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Labs</a>
@@ -187,13 +188,13 @@
             <div class="left-space">
                 <div class="content">
 
-                    <div style="text-align: center;">
+                    <div style="text-align: center; width:500px; height: 500px">
 
                         <img src="data:image/svg+xml;base64,{{ img }}" width="500" height="500" style="border-radius: 10px; border: 2px solid darkgray;" usemap="#mapname">
                         {% if img %}
                         <map name="mapname">
                             {% for key, coordinates in squares.items() %}
-                            <area id="{{key}}" shape="poly" coords="{% for x, y in coordinates %}{{ x }},{{ y }}, {% endfor %}" href="{{key}}.html">
+                            <area shape="poly" coords="{% for x, y in coordinates %}{{ x }},{{ y }}, {% endfor %}" href="#" onclick="highlightAndScroll('{{key}}')">
                             {% endfor %}
                         </map>
                         {% endif %}
@@ -225,26 +226,90 @@
                 </div>
 
                 <div class="content" style="overflow-y: auto;">
-                    <div style="height: 1000px;">
+                    <div>
 
                         <div class="spacer" style="width: 100%; height: 15px;"></div>
 
+                        {% if qr_data %}
+                        {% for qr in qr_data %}
+                        <div id="{{qr.qr_id}}" style="border-width: 5px; border-color:rgb(240, 240, 240); border-style:solid;">
                         <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
                           <div class="ms-2 me-auto">
                               <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">QR ID</div>
-                              <span style="color: #111;" id="field1">test</span>
+                              <span style="color: #111;" id="field1">{{qr.qr_id}}</span>
                           </div></li>
-
-                        <!-- This displays a dynamic list for QR:Attributes. (key, pair) = (field-name, field-data) -->
-                        <!-- Display the selected lab Name here -->
-                        {% if qr_data %}
-                        {% for qr in qr_data %}
-                            <p id="formDataDisplay" class="fade-in" style="font-size: 12pt;">ID: {{qr.qr_id}}</p>
-                        {% endfor %}
-                        {% endif %}
-
-                    
-                        <div class="spacer" style="width: 100%; height: 0.5px;"></div>
+                          <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 1</div>
+                                <span style="color: #111;" id="field1">{{qr.attr_0}}</span>
+                            </div></li>
+                          {% if qr.attr_1 %}
+                          <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 2</div>
+                                <span style="color: #111;" id="field1">{{qr.attr_1}}</span>
+                            </div></li>
+                            {% endif %}
+                            {% if qr.attr_2 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 3</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_2}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_3 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 4</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_3}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_4 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 5</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_4}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_5 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 6</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_5}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_6 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 7</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_6}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_7 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 8</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_7}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_8 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 9</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_8}}</span>
+                              </div></li>
+                            {% endif %}
+                            {% if qr.attr_9 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start" style="border-color: rgb(240, 240, 240);">
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold" style="font-weight: 600; color: #333; font-size: 11pt;">Attribute 10</div>
+                                  <span style="color: #111;" id="field1">{{qr.attr_9}}</span>
+                              </div></li>
+                            {% endif %}
+                            <div class="spacer" style="width: 100%; height: 5px;"></div>
+                          </div>
+                          {% endfor %}
+                          {% endif %}
 
                         <ol class="list-group list-group-numbered fade-in">
                           <!-- List items will be dynamically generated here -->
@@ -299,7 +364,32 @@
 
 <script>
 
-const microQR_ID = "Micro_QR_ID (a var)";
+  prevHaSId = ""
+
+  function highlightAndScroll(id) {
+
+    if (prevHaSId != "") {
+      document.getElementById(prevHaSId).style.borderColor = "#f0f0f0"
+    }
+
+    var element = document.getElementById(id); 
+
+    if (element) {
+      element.style.borderColor = 'red'; 
+
+      element.scrollIntoView({behavior: 'smooth', block:"center"})
+
+      prevHaSId = id
+    }
+    else {
+      alert("No data for this QR exists!")
+    }
+
+  }
+
+
+
+const microQR_ID = "Searching in {{selected_lab}} : {{selected_group}}";
 document.getElementById("microQR_ID").innerHTML = microQR_ID;
 
   // List of field names
@@ -333,7 +423,7 @@ document.getElementById("microQR_ID").innerHTML = microQR_ID;
     { labelName: 'Attr 2', input: "test" },
   ];
 
-  displayInitialData(simList);
+  //displayInitialData(simList);
   
 
   // Function to generate dynamic form fields. Backend data for each QR code is used here
@@ -433,6 +523,24 @@ function generateDynamicFormFields(listName) {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/es6-promise/dist/es6-promise.auto.min.js"
+></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/imagemapster/1.6.0/jquery.imagemapster.min.js"></script>
+
+<!--
+<script type="text/javascript">
+
+    $('img[usemap]').mapster({
+    fillColor: 'ff0000',
+    stroke: true,
+    singleSelect: true
+    });
+
+</script>
+
+-->
 
 
 </body>

@@ -29,6 +29,9 @@ from playhouse.shortcuts import model_to_dict
 from dotenv import load_dotenv
 
 import shutil
+import json
+
+from collections import defaultdict
 
 load_dotenv()
 
@@ -86,6 +89,7 @@ def callback():
 
 @app.route("/login")
 def login():
+    session['labs'] = []
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
@@ -136,6 +140,7 @@ def logout():
 def homepage():
     if 'user' not in session:
         return redirect(url_for("main"))
+    '''
     if request.method == 'POST' :
         file = request.files['file']
         if file:
@@ -153,7 +158,81 @@ def homepage():
                 encoded = base64.b64encode(data.encode()).decode()
 
             return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map)
-    return render_template('index.html', session = session.get("user"))
+
+    
+    '''
+    if 'labs' not in session: 
+        session['labs'] = []
+    if 'groups' not in session: 
+        session['groups'] = defaultdict(list)
+
+    session["labs"].append("lab1")
+    session["labs"].append("lab2")
+    session["labs"].append("lab3")
+    session["labs"].append("lab4")
+
+    session['groups']['lab1'].append("Group1lab1")
+    session['groups']['lab1'].append("Group2lab1")
+    session['groups']['lab1'].append("Group3lab1")
+    session['groups']['lab2'].append("Group1lab2")
+    session['groups']['lab3'].append("Group1lab3")
+    session['groups']['lab3'].append("Group2lab3")
+    session['groups']['lab4'].append("Group1lab4")
+    session['groups']['lab4'].append("Group2lab4")
+    return render_template('home.html', session = session)
+
+
+@app.route('/scan', methods=['GET', 'POST'])
+def scan():
+    if 'user' not in session: 
+        return redirect(url_for("main"))
+    if request.method == 'POST' :
+        file = request.files['file']
+        if file:
+            image_bytes = file.read()
+            image = Image.open(io.BytesIO(image_bytes))
+            temp_dir = tempfile.mkdtemp()
+            temp_file_path = os.path.join(temp_dir, 'temp.png')
+            image.save(temp_file_path)
+            img, ids, coordinate_map = do_stuff(temp_file_path, "./outputs")
+
+            os.remove(temp_file_path)
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            with open('./outputs/temp.svg', 'r') as file:
+                data = file.read()
+                encoded = base64.b64encode(data.encode()).decode()
+
+
+            qr_values = ids.values()
+
+
+
+            qr_data = QRs.select().where(QRs.qr_id.in_(qr_values) and QRs.group_id == session["selectedGroup"])
+            qr_data = qr_data.execute()
+
+            
+
+            
+            return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = session["selectedGroup"], selected_lab=session["selectedLab"])
+    return render_template('fetch.html', selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
+
+
+@app.route('/set/labandgroup', methods=['POST'])
+def setLabandGroup() :
+    if 'user' not in session: 
+        return redirect(url_for("main"))
+    if request.method == 'POST' :
+        lab = request.form['labSelect']
+        group = request.form['grpSelect']
+
+        session['selectedLab'] = lab
+        session['selectedGroup'] = group
+
+        return redirect(url_for('scan'))
+
+
+        
+
 
 # ==========================================================================
 # CREATING ENDPOINTS FOR USER REGISTRATION
