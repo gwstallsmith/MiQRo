@@ -212,6 +212,43 @@ def setLabandGroup() :
         return redirect(url_for('scan'))
 
 
+@app.route('/editQRData', methods=['POST'])
+def editQRData() :
+    if 'user' not in session: 
+        return redirect(url_for("main"))
+    if request.method == 'POST' :
+
+        qr_id = request.form['QR_ID']
+        group = session['selectedGroup']
+
+        qr = QRs.get((QRs.qr_id == qr_id) and (QRs.group_id == group))
+
+        if request.form['attr_0'] != "" :
+            qr.attr_0 = request.form['attr_0']
+        if request.form['attr_1'] != "" :
+            qr.attr_0 = request.form['attr_1']
+        if request.form['attr_2'] != "" :
+            qr.attr_0 = request.form['attr_2']
+        if request.form['attr_3'] != "" :
+            qr.attr_0 = request.form['attr_3']
+        if request.form['attr_4'] != "" :
+            qr.attr_0 = request.form['attr_4']
+        if request.form['attr_5'] != "" :
+            qr.attr_0 = request.form['attr_5']
+        if request.form['attr_6'] != "" :
+            qr.attr_0 = request.form['attr_6']
+        if request.form['attr_7'] != "" :
+            qr.attr_0 = request.form['attr_7']
+        if request.form['attr_8'] != "" :
+            qr.attr_0 = request.form['attr_8']
+        if request.form['attr_9'] != "" :
+            qr.attr_0 = request.form['attr_9']
+
+        qr.save()
+
+        return redirect(url_for(scan))
+        
+
         
 
 
