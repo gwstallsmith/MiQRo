@@ -14,6 +14,7 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, send_from_directory
 from authlib.integrations.base_client.errors import OAuthError
+from flask_session import Session
 
 from Scanner.MicroQRCodeScanner import do_stuff
 import base64
@@ -32,6 +33,7 @@ import shutil
 import json
 
 from collections import defaultdict
+from redis import Redis
 
 load_dotenv()
 
@@ -46,8 +48,12 @@ app.secret_key = env.get("APP_SECRET_KEY")
 upload_folder = './uploads'
 
 app.config['UPLOAD_FOLDER'] = upload_folder
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = Redis(host='redis', port=6379)
+app.config['SESSION_PERMANENT'] = False
 
 oauth = OAuth(app)
+server_session = Session(app)
 
 oauth.register(
     "auth0",
@@ -179,6 +185,7 @@ def homepage():
     session['groups']['lab3'].append("Group2lab3")
     session['groups']['lab4'].append("Group1lab4")
     session['groups']['lab4'].append("Group2lab4")
+
     return render_template('home.html', session = session)
 
 
@@ -210,10 +217,21 @@ def scan():
             qr_data = QRs.select().where(QRs.qr_id.in_(qr_values) and QRs.group_id == session["selectedGroup"])
             qr_data = qr_data.execute()
 
+            session['img'] = encoded
+            session['ids'] = ids
+            session['squares'] = coordinate_map
+
+
             
 
             
             return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = session["selectedGroup"], selected_lab=session["selectedLab"])
+    
+    if 'img' in session and 'ids' in session and 'squares' in session :
+        qr_data = QRs.select().where(QRs.qr_id.in_(session['ids'].values()) and QRs.group_id == session["selectedGroup"])
+        qr_data = qr_data.execute()
+        return render_template('fetch.html', session=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data, selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
+    
     return render_template('fetch.html', selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
 
 
@@ -245,27 +263,27 @@ def editQRData() :
         if request.form['attr_0'] != "" :
             qr.attr_0 = request.form['attr_0']
         if request.form['attr_1'] != "" :
-            qr.attr_0 = request.form['attr_1']
+            qr.attr_1 = request.form['attr_1']
         if request.form['attr_2'] != "" :
-            qr.attr_0 = request.form['attr_2']
+            qr.attr_2 = request.form['attr_2']
         if request.form['attr_3'] != "" :
-            qr.attr_0 = request.form['attr_3']
+            qr.attr_3 = request.form['attr_3']
         if request.form['attr_4'] != "" :
-            qr.attr_0 = request.form['attr_4']
+            qr.attr_4 = request.form['attr_4']
         if request.form['attr_5'] != "" :
-            qr.attr_0 = request.form['attr_5']
+            qr.attr_5 = request.form['attr_5']
         if request.form['attr_6'] != "" :
-            qr.attr_0 = request.form['attr_6']
+            qr.attr_6 = request.form['attr_6']
         if request.form['attr_7'] != "" :
-            qr.attr_0 = request.form['attr_7']
+            qr.attr_7 = request.form['attr_7']
         if request.form['attr_8'] != "" :
-            qr.attr_0 = request.form['attr_8']
+            qr.attr_8 = request.form['attr_8']
         if request.form['attr_9'] != "" :
-            qr.attr_0 = request.form['attr_9']
+            qr.attr_9 = request.form['attr_9']
 
         qr.save()
 
-        return redirect(url_for(scan))
+        return redirect(url_for("scan"))
         
 
         

@@ -24,5 +24,14 @@ services:
     volumes:
       - mydatabase:/var/lib/mysql
 
+  redis:
+    image: redis:latest
+    container_name: rd01
+    ports:
+      - '6379:6379'
+    restart: always
+    expose:
+      - '6379'
+
 volumes:
   mydatabase:
