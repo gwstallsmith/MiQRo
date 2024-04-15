@@ -188,12 +188,19 @@
           <li class="nav-item active">
             <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Labs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
-          </li>
+          <li class="nav-item dropdown"> <!-- Added dropdown class -->
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Labs
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="#">View Labs</a>
+                <div class="dropdown-divider"></div> 
+                <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                <div class="dropdown-divider"></div> <!-- Divider between links -->
+                <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
+            </div>
+        </li>
+
           <!-- Add more nav items as needed -->
         </ul>
       </div>
@@ -359,8 +366,8 @@
             <!-- Dynamic lab select menu -->
             <select class="form-control" id="lab_select" name="labSelect" onchange="populateGroups()">
               <option selected>Select a Lab</option>
-              {% for lab in session.get('labs', []) %}
-              <option value="{{lab}}">{{lab}}</option>
+              {% for lab in session.get('labs') %}
+              <option value="{{lab[0]}}">{{lab[1]}}</option>
               {% endfor %}
               <!-- Lab options will be dynamically populated here -->
             </select>
@@ -386,6 +393,77 @@
   </div>
 </div>
 
+<div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/api/create_lab" method="POST">
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                  <label for="Group" style="font-weight: bold;">Lab Name:</label>
+                </div><div class="col-md-9">
+                  <input type="text" class="form-control" id="lab_name" name="lab_name" placeholder="Enter Lab Name" control-id="ControlID-4">
+                </div>
+              </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/api/create_group" method="POST">
+  
+            <div class="form-group">
+              <label for="labSelect">Lab</label>
+              <!-- Dynamic lab select menu -->
+              <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroups()">
+                <option selected>Select a Lab</option>
+                {% for lab in session.get('labs') %}
+                <option value="{{lab[0]}}">{{lab[1]}}</option>
+                {% endfor %}
+                <!-- Lab options will be dynamically populated here -->
+              </select>
+            </div>
+  
+            
+            <div class="form-group">
+              <label for="grpSelect">Group</label>
+              <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
+            </div> 
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+  
+
 <script>
 
     var groups = JSON.parse('{{ session['groups'] | tojson | safe}}');
@@ -408,6 +486,15 @@
                 group_select.appendChild(optionEl);
             }
         }
+    }
+
+
+    function createLab() {
+        $("#createLabModal").modal("toggle"); 
+    }
+
+    function createGroup() {
+        $("#createGroupModal").modal("toggle");
     }
 </script>
 

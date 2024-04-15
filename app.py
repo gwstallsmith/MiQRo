@@ -89,7 +89,11 @@ def callback():
         if e.error == "access_denied":
             session['error'] = "You must sign in with a kent.edu email!"
             return redirect(url_for("main"))
+    user, created = Users.get_or_create(email = token["userinfo"]["email"], password = "")
     session["user"] = token
+    session["email"] = user.email
+    session["user_id"] = user.user_id
+    session["labs"] = getUserLabs()
     return redirect(url_for("homepage"))
 
 
@@ -106,7 +110,7 @@ def register():
 
 @app.route("/labhome")
 def lab_home():
-    return render_template('labhome.html')
+    return render_template('labs.html')
 
 @app.route("/addlab")
 def lab_add():
@@ -146,45 +150,8 @@ def logout():
 def homepage():
     if 'user' not in session:
         return redirect(url_for("main"))
-    '''
-    if request.method == 'POST' :
-        file = request.files['file']
-        if file:
-            image_bytes = file.read()
-            image = Image.open(io.BytesIO(image_bytes))
-            temp_dir = tempfile.mkdtemp()
-            temp_file_path = os.path.join(temp_dir, 'temp.png')
-            image.save(temp_file_path)
-            img, ids, coordinate_map = do_stuff(temp_file_path, "./outputs")
-
-            os.remove(temp_file_path)
-            shutil.rmtree(temp_dir, ignore_errors=True)
-            with open('./outputs/temp.svg', 'r') as file:
-                data = file.read()
-                encoded = base64.b64encode(data.encode()).decode()
-
-            return render_template('index.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map)
-
-    
-    '''
-    if 'labs' not in session: 
-        session['labs'] = []
     if 'groups' not in session: 
         session['groups'] = defaultdict(list)
-
-    session["labs"].append("lab1")
-    session["labs"].append("lab2")
-    session["labs"].append("lab3")
-    session["labs"].append("lab4")
-
-    session['groups']['lab1'].append("Group1lab1")
-    session['groups']['lab1'].append("Group2lab1")
-    session['groups']['lab1'].append("Group3lab1")
-    session['groups']['lab2'].append("Group1lab2")
-    session['groups']['lab3'].append("Group1lab3")
-    session['groups']['lab3'].append("Group2lab3")
-    session['groups']['lab4'].append("Group1lab4")
-    session['groups']['lab4'].append("Group2lab4")
 
     return render_template('home.html', session = session)
 
@@ -210,12 +177,12 @@ def scan():
                 encoded = base64.b64encode(data.encode()).decode()
 
 
-            qr_values = ids.values()
-
-
-
-            qr_data = QRs.select().where(QRs.qr_id.in_(qr_values) and QRs.group_id == session["selectedGroup"])
+            qr_values = list(ids.values())
+            qr_values = [x.lstrip('0') for x in qr_values]
+    
+            qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == session["selectedGroup"]))
             qr_data = qr_data.execute()
+
 
             session['img'] = encoded
             session['ids'] = ids
@@ -228,8 +195,11 @@ def scan():
             return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = session["selectedGroup"], selected_lab=session["selectedLab"])
     
     if 'img' in session and 'ids' in session and 'squares' in session :
-        qr_data = QRs.select().where(QRs.qr_id.in_(session['ids'].values()) and QRs.group_id == session["selectedGroup"])
+        qr_values = list(session['ids'].values())
+        qr_values = [x.lstrip('0') for x in qr_values]
+        qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == session["selectedGroup"]))
         qr_data = qr_data.execute()
+        #qr_data = QRs.get_or_none(QRs.qr_id.in_(qr_values), QRs.group_id == session["selectedGroup"])
         return render_template('fetch.html', session=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data, selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
     
     return render_template('fetch.html', selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
@@ -243,8 +213,22 @@ def setLabandGroup() :
         lab = request.form['labSelect']
         group = request.form['grpSelect']
 
-        session['selectedLab'] = lab
+        try: 
+            selLab = Labs.get(Labs.lab_id == lab)
+            session['selectedLab'] = {selLab.lab_id: selLab.lab_name}
+        except Labs.DoesNotExist:
+            return None
+        
+
+
         session['selectedGroup'] = group
+
+        if 'img' in session: 
+            session.pop('img')
+        if 'ids' in session:
+            session.pop('ids')
+        if 'squares' in session:
+            session.pop('squares')
 
         return redirect(url_for('scan'))
 
@@ -255,10 +239,12 @@ def editQRData() :
         return redirect(url_for("main"))
     if request.method == 'POST' :
 
-        qr_id = request.form['QR_ID']
+        qr_id_ = request.form['QR_ID']
         group = session['selectedGroup']
 
-        qr = QRs.get((QRs.qr_id == qr_id) and (QRs.group_id == group))
+        #print("QR_ID", qr_id, flush=True)
+
+        qr = QRs.get((QRs.qr_id == qr_id_) & (QRs.group_id == group))
 
         if request.form['attr_0'] != "" :
             qr.attr_0 = request.form['attr_0']
@@ -284,9 +270,57 @@ def editQRData() :
         qr.save()
 
         return redirect(url_for("scan"))
+    
+
+@app.route('/addQRData', methods=['POST'])
+def addQRData() :
+    if 'user' not in session: 
+        return redirect(url_for("main"))
+    if request.method == 'POST' :
+
+        qr_id_ = request.form['addQR']
+        group = session['selectedGroup']
+
+        qr = QRs.insert(qr_id = qr_id_, group_id = group).execute()
+
+        qr = QRs.get((QRs.qr_id == qr_id_) & (QRs.group_id == group))
+
+
+        if request.form['attr_0'] != "" :
+            qr.attr_0 = request.form['attr_0']
+        if request.form['attr_1'] != "" :
+            qr.attr_1 = request.form['attr_1']
+        if request.form['attr_2'] != "" :
+            qr.attr_2 = request.form['attr_2']
+        if request.form['attr_3'] != "" :
+            qr.attr_3 = request.form['attr_3']
+        if request.form['attr_4'] != "" :
+            qr.attr_4 = request.form['attr_4']
+        if request.form['attr_5'] != "" :
+            qr.attr_5 = request.form['attr_5']
+        if request.form['attr_6'] != "" :
+            qr.attr_6 = request.form['attr_6']
+        if request.form['attr_7'] != "" :
+            qr.attr_7 = request.form['attr_7']
+        if request.form['attr_8'] != "" :
+            qr.attr_8 = request.form['attr_8']
+        if request.form['attr_9'] != "" :
+            qr.attr_9 = request.form['attr_9']
+
+        qr.save()
+
+        return redirect(url_for("scan"))
+
+
+    
         
 
-        
+@app.route('/labs', methods=['POST', 'GET'])
+def labsPage() :
+    if 'user' not in session:
+        return redirect(url_for("main"))
+    
+    return render_template("labs.html")
 
 
 # ==========================================================================
@@ -344,6 +378,33 @@ def userLogin():
         return {'message': 'User not found'}
     
 
+#@app.route('/api/getUserLabs', methods=['GET'])
+def getUserLabs() :
+    query = (Labs
+             .select(Labs.lab_id, Labs.lab_name)
+             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
+             .where(Lab_Permissions.user_id == session['user_id']))
+    
+    labs = [(lab.lab_id, lab.lab_name) for lab in query]
+
+
+    return labs
+
+@app.route('/api/getUserGroups')
+def getUserGroups() :
+    lab_groups = []
+
+    user_labs = (Labs
+             .select(Labs.lab_id, Labs.lab_name)
+             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
+             .where(Lab_Permissions.user_id == session['user_id']))
+    
+    for lab in user_labs:
+        groups = [{'id': group.group_id, 'name': group.group_name} for group in lab.groups]
+        lab_groups[lab.lab_id] = {'name': lab.lab_name, 'groups': groups}
+
+    
+
 
 @app.route('/api/user', methods=['GET'])
 def getUserCreated():
@@ -399,19 +460,29 @@ def create_lab():
     if not lab_name:
         return {'error': 'Invalid lab name'}, 400
 
+    user_id_ = session['user_id']
+
+    try:
+        user = Users.get(Users.user_id == user_id_)
+    except Users.DoesNotExist:
+        return {'error:' 'Invalid User'}, 400
+    
     lab = Labs.create(lab_name = lab_name)
 
-    user_id = int(session.get('user').get('user_id'))
+    print("USERID: ", int(user_id_), flush=True)
 
-    Lab_Permissions.create(lab_user = user_id, lab_id = lab.lab_id, lab_admin = True)
+    Lab_Permissions.create(user_id = int(user_id_), lab_id = lab.lab_id, lab_admin = True)
+
+    session['labs'] = getUserLabs()
     
 
-    return render_template('labhome.html')
+    return redirect(url_for("homepage"))
 
 @app.route("/api/create_group", methods=['GET', 'POST'])
 def create_group():
 
     group_name = request.form.get('group_name')
+    lab_id = request.form.get('lab_id')
 
     if not group_name:
         return {'error': 'Invalid group name'}, 400
@@ -438,6 +509,19 @@ def get_groups():
         for g in Groups
     ]
     return None
+
+
+@app.route('/api/qrs/', methods=['GET'])
+def get_qrs():
+    qrs = [
+        model_to_dict(p)
+        for p in QRs
+    ]
+
+    if not qrs:
+        return {'qrs: ': len(qrs)}
+    
+    return {'qrs: ': qrs}
 
 # ==========================================================================
 if __name__ == "__main__":

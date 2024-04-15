@@ -41,7 +41,7 @@ class Groups(BaseModel):
     group_name = CharField()
 
 class QRs(BaseModel):
-    qr_id = AutoField(primary_key=True)
+    qr_id = CharField()
     group_id = CharField()
     attr_0 = CharField()
     attr_1 = CharField()
@@ -54,11 +54,16 @@ class QRs(BaseModel):
     attr_8 = CharField()
     attr_9 = CharField()
 
-# Drop tables if they exist
+    class Meta:
+        database = db
+        db_table='QRs'
+        primary_key = CompositeKey('qr_id', 'group_id')
+
+# Drop tables if they exist\
 def drop_tables():
     with db:
-        db.drop_tables([Labs, Lab_Permissions, Groups, QRs])
-#drop_tables()
+        db.drop_tables([Users, Labs, Lab_Permissions, Groups, QRs])
+drop_tables()
 
 db.connect()
 db.create_tables([Users, Labs, Lab_Permissions, Groups, QRs])
