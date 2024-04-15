@@ -43,7 +43,7 @@ if ENV_FILE:
     load_dotenv(ENV_FILE)
 
 app = Flask(__name__)
-app.secret_key = env.get("APP_SECRET_KEY")
+#app.secret_key = env.get("APP_SECRET_KEY")
 
 upload_folder = './uploads'
 
@@ -51,6 +51,8 @@ app.config['UPLOAD_FOLDER'] = upload_folder
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = Redis(host='redis', port=6379)
 app.config['SESSION_PERMANENT'] = False
+app.config['SECRET_KEY'] = os.urandom(24)
+app.config.update(SESSION_COOKIE_NAME=os.urandom(24).hex())
 
 oauth = OAuth(app)
 server_session = Session(app)
@@ -94,6 +96,7 @@ def callback():
     session["email"] = user.email
     session["user_id"] = user.user_id
     session["labs"] = getUserLabs()
+    session["groups"] = getUserGroups()
     return redirect(url_for("homepage"))
 
 
@@ -150,8 +153,6 @@ def logout():
 def homepage():
     if 'user' not in session:
         return redirect(url_for("main"))
-    if 'groups' not in session: 
-        session['groups'] = defaultdict(list)
 
     return render_template('home.html', session = session)
 
@@ -179,8 +180,8 @@ def scan():
 
             qr_values = list(ids.values())
             qr_values = [x.lstrip('0') for x in qr_values]
-    
-            qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == session["selectedGroup"]))
+
+            qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == list(session["selectedGroup"].keys())[0]))
             qr_data = qr_data.execute()
 
 
@@ -188,21 +189,18 @@ def scan():
             session['ids'] = ids
             session['squares'] = coordinate_map
 
-
             
-
-            
-            return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = session["selectedGroup"], selected_lab=session["selectedLab"])
+            return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
     
     if 'img' in session and 'ids' in session and 'squares' in session :
         qr_values = list(session['ids'].values())
         qr_values = [x.lstrip('0') for x in qr_values]
-        qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == session["selectedGroup"]))
+        qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == list(session["selectedGroup"].keys())[0]))
         qr_data = qr_data.execute()
         #qr_data = QRs.get_or_none(QRs.qr_id.in_(qr_values), QRs.group_id == session["selectedGroup"])
-        return render_template('fetch.html', session=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data, selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
+        return render_template('fetch.html', session=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data,  selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
     
-    return render_template('fetch.html', selected_group = session.get("selectedGroup"), selected_lab=session.get("selectedLab"))
+    return render_template('fetch.html',  selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
 
 
 @app.route('/set/labandgroup', methods=['POST'])
@@ -220,8 +218,8 @@ def setLabandGroup() :
             return None
         
 
-
-        session['selectedGroup'] = group
+        selGroup = Groups.get(Groups.group_id == group)
+        session['selectedGroup'] = {selGroup.group_id: selGroup.group_name}
 
         if 'img' in session: 
             session.pop('img')
@@ -240,7 +238,7 @@ def editQRData() :
     if request.method == 'POST' :
 
         qr_id_ = request.form['QR_ID']
-        group = session['selectedGroup']
+        group = list(session['selectedGroup'].keys())[0]
 
         #print("QR_ID", qr_id, flush=True)
 
@@ -279,7 +277,7 @@ def addQRData() :
     if request.method == 'POST' :
 
         qr_id_ = request.form['addQR']
-        group = session['selectedGroup']
+        group = list(session['selectedGroup'].keys())[0]
 
         qr = QRs.insert(qr_id = qr_id_, group_id = group).execute()
 
@@ -320,7 +318,9 @@ def labsPage() :
     if 'user' not in session:
         return redirect(url_for("main"))
     
-    return render_template("labs.html")
+
+    
+    return render_template("labs.html", session = session)
 
 
 # ==========================================================================
@@ -392,7 +392,7 @@ def getUserLabs() :
 
 @app.route('/api/getUserGroups')
 def getUserGroups() :
-    lab_groups = []
+    lab_groups = defaultdict()
 
     user_labs = (Labs
              .select(Labs.lab_id, Labs.lab_name)
@@ -402,6 +402,23 @@ def getUserGroups() :
     for lab in user_labs:
         groups = [{'id': group.group_id, 'name': group.group_name} for group in lab.groups]
         lab_groups[lab.lab_id] = {'name': lab.lab_name, 'groups': groups}
+
+    return lab_groups
+
+@app.route('/api/getUserGroupsD')
+def getUserGroupsD() :
+    lab_groups = defaultdict()
+
+    user_labs = (Labs
+             .select(Labs.lab_id, Labs.lab_name)
+             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
+             .where(Lab_Permissions.user_id == session['user_id']))
+    
+    for lab in user_labs:
+        groups = [{'id': group.group_id, 'name': group.group_name} for group in lab.groups]
+        lab_groups[lab.lab_id] = {'name': lab.lab_name, 'groups': groups}
+
+    return {"Lab Groups": lab_groups}
 
     
 
@@ -476,7 +493,10 @@ def create_lab():
     session['labs'] = getUserLabs()
     
 
-    return redirect(url_for("homepage"))
+    if (request.form.get('returnTo') == "labPage") :
+        return redirect(url_for("labsPage"))
+    else:
+        return redirect(url_for('homepage'))
 
 @app.route("/api/create_group", methods=['GET', 'POST'])
 def create_group():
@@ -486,8 +506,6 @@ def create_group():
 
     if not group_name:
         return {'error': 'Invalid group name'}, 400
-    
-    lab_id = session.get('user').get('lab_id')
 
     group = Groups.create(lab_id = lab_id, group_name = group_name)
 
@@ -498,9 +516,13 @@ def create_group():
         "group_id": group.group_id
     }
 
-    session["user"] = userinfo
+   # session["user"] = userinfo
+    session["groups"] = getUserGroups()
 
-    return render_template("labhome.html")
+    if (request.form.get('returnTo') == "labPage") :
+        return redirect(url_for("labsPage"))
+    else:
+        return redirect(url_for('homepage'))
 
 @app.route("/api/groups", methods=['GET'])
 def get_groups():
@@ -522,6 +544,30 @@ def get_qrs():
         return {'qrs: ': len(qrs)}
     
     return {'qrs: ': qrs}
+
+@app.route('/getCurrentUser')
+def getCurrentUser(): 
+    return {"User: ": session['user']}
+
+@app.route('/qrbygroup')
+def qrbygroup(): 
+    query = (QRs
+             .select(QRs.group_id, QRs.qr_id, QRs.attr_0, QRs.attr_1, QRs.attr_2,
+                     QRs.attr_3, QRs.attr_4, QRs.attr_5, QRs.attr_6,
+                     QRs.attr_7, QRs.attr_8, QRs.attr_9)
+             .join(Groups, on=(QRs.group_id == Groups.group_id))
+             .order_by(QRs.group_id))
+
+    qr_data_by_group = {}
+    for qr in query:
+        group_id = qr.group_id.group_id
+        qr_info = [qr.qr_id, qr.attr_0, qr.attr_1, qr.attr_2, qr.attr_3,
+                   qr.attr_4, qr.attr_5, qr.attr_6, qr.attr_7, qr.attr_8, qr.attr_9]
+        if group_id not in qr_data_by_group:
+            qr_data_by_group[group_id] = []
+        qr_data_by_group[group_id].append(qr_info)
+
+    return {"Result":qr_data_by_group}
 
 # ==========================================================================
 if __name__ == "__main__":
