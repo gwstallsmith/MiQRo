@@ -35,6 +35,8 @@ import json
 from collections import defaultdict
 from redis import Redis
 
+import qrcode
+
 load_dotenv()
 
 
@@ -128,7 +130,70 @@ def render_create_group():
 def edit_data():
     return render_template('editdata.html')
 
+@app.route("/generate_qrs")
+def render_generate_qrs():
+    return render_template('qr.html')
 
+def get_highest_qr_id():
+    highest_qr_id = QRs.select(fn.MAX(SQL('CAST(qr_id AS UNSIGNED)')))
+    highest_qr_id = highest_qr_id.scalar()
+    
+    if highest_qr_id is not None:
+        return int(highest_qr_id) + 1
+    else:
+        return 1
+
+
+
+@app.route('/generate_codes', methods=['GET', 'POST'])
+def generate_qr_code():
+    number_of_codes = int(request.form['number_of_codes'])
+    qr_size = int(request.form['code_size'])
+    border_size = 1
+
+    qr_codes = []  # List to store QR code PIL images
+
+    # Loop to generate QR codes
+    for i in range(get_highest_qr_id(), number_of_codes + get_highest_qr_id()):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=qr_size,
+            border=border_size,
+        )
+
+        QRs.create(qr_id = str(i))
+
+        qr.add_data(str(i))
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        qr_codes.append(img)  # Append QR code image to list
+
+    rows = int((number_of_codes - 1) / 6) + 1
+    cols = min(number_of_codes, 6)
+
+    total_width = int(qr_size * 32 + border_size/2) * cols
+    total_height = int(qr_size * 32 + border_size) * rows
+
+    combined_image = Image.new('RGB', (total_width, total_height), color='white')
+
+
+    for i, qr_code_img in enumerate(qr_codes):
+        row = int(i/cols)
+        col = i % cols
+
+        x_offset = col * (qr_size * 32 + border_size)
+        y_offset = row * (qr_size * 32 + border_size)
+
+        combined_image.paste(qr_code_img, (x_offset, y_offset))
+
+    # Save the combined image
+    file_name = 'qr.png'
+    combined_image.save('static/' + file_name)
+
+    return render_template('qr.html', file_name=file_name)
+
+ 
 @app.route("/logout")
 def logout():
     session.clear()
@@ -522,6 +587,7 @@ def get_qrs():
         return {'qrs: ': len(qrs)}
     
     return {'qrs: ': qrs}
+    
 
 # ==========================================================================
 if __name__ == "__main__":
