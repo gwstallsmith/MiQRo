@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bootstrap Navbar with TV-shaped Outer Container</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+       
+        <style>
+          /* Custom CSS for TV-shaped outer container */
+          html, body {
+                  margin: 0;
+                  padding: 0;
+                  font-family: Arial, sans-serif;
+                  background-color: #fff;
+              }
+      
+          .tv-container {
+            position: relative;
+            width: 100%; /* Cover entire width of the page */
+            height: 100vh; /* Cover entire height of the viewport */
+            background-color: #333; /* Dark grey background */
+            overflow: hidden;
+            border-radius: 0; /* Square outer corners */
+          }
+      
+          .tv-screen {
+            position: absolute;
+            top: 20px;
+            left: 5px;
+            right: 5px;
+            bottom: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background-color: #fff; /* White background for inner content */
+            border-radius: 20px; /* Rounded corners for inner content */
+            overflow: hidden;
+          }
+      
+          /* White text for navbar items */
+          .navbar-nav .nav-link {
+            color: #333;
+          }
+      
+          /* Padding for tab content */
+          .tab-content .tab-pane .content-wrapper {
+            padding-top: 10px; /* Top padding */
+            padding-bottom: 10px; /* Bottom padding */
+            padding-left: 15px; /* Left padding */
+            padding-right: 15px; /* Right padding */
+          }
+      
+          .container {
+                  align-items: stretch;
+                  width: 100%;
+                  height: 100vh;
+                  min-width:100%;
+                  position: relative;
+                  display: flex;
+                  padding: 0px;
+          }
+          
+          .left-space {
+                  flex: 1.2;
+                  background-color:white;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  overflow-y: auto;
+                  padding: 0px;
+                  position: relative;
+          }
+              .left-space .app-bar {
+                  position: sticky;
+                  top: 0;
+                  background-color: #F5F5F5;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  border-bottom-left-radius: 10px;
+                  border-bottom-right-radius: 10px;
+                  color: black;
+                
+                  padding-left: 20px;
+                  padding-right: 20px;
+                  padding-bottom: 10px;
+                  padding-top: 10px;
+                  z-index: 1;
+              }
+              .left-space .content {
+                  padding-top: 30px; /* Adjust padding to make space for the app bar */
+                  padding-left: 2.5px; /* Add left padding for the content */
+                  padding-right: 5px; /* Add right padding for the content */
+              }
+              .right-space {
+                  flex: 1.8;
+                  background-color: #FDFDFD;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  overflow-y: scroll;
+                  position: relative;
+              }
+              .right-space .app-bar {
+                  position: sticky;
+                  top: 0;
+                  background-color: #357EC7; /*#316FF6 #357EC7  #2F75B2  #357EC7;  */
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  color: white;
+            
+                  padding-left: 30px;
+                  padding-right: 25px;
+                  padding-top: 15px;
+                  padding-bottom: 10px;
+                  
+                  z-index: 1;
+              }
+              .right-space .content {
+                  padding-top: 25px; /* Adjust padding to make space for the app bar */
+                  padding-left: 20px; /* Add left padding for the content */
+                  padding-right: 20px; /* Add right padding for the content */
+              }
+              .divider {
+                  flex: 0 0 25px;
+                  background-color: transparent;
+              }
+              .content-wrapper {
+                padding: 0px;
+              }
+              .card-text {
+               font-size: 15px;
+              }
+      
+              .card-title {
+               font-weight: bold;
+              }
+      
+              /* Define fade-in-up animation */
+              @keyframes fade-in-up {
+                0% {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+      
+              /* Apply fade-in-up animation to list items */
+              .list-group-item {
+                animation: fade-in-up 0.5s ease-out; /* Adjust duration and timing function as needed */
+              }
+
+              .selected {
+                background-color: #007bff; /* Blue background color */
+                color: #fff; /* White text color */
+              }
+      
+              /* Define fade-in-right animation */
+              @keyframes fade-in-right {
+                0% {
+                  opacity: 0;
+                  transform: translateX(-20px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateX(0);
+                }
+              }
+      
+              /* Apply fade-in-right animation to the target text */
+              .fade-in-right {
+                animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
+              }
+
+              .non-selectable {
+                user-select: none;
+              }
+
+              .placeholder2 {
+
+              }
+              
+      
+        </style>
+        <script src="group_choice_modal.js"></script>
+      </head>
+      <body>
+      
+      <div class="tv-container">
+        <div class="tv-screen">
+          <!-- Navbar -->
+          <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand font-weight-bold" href="#">MiQR</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+      
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown"> <!-- Added dropdown class -->
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Labs
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="{{url_for('labsPage')}}">View Labs</a>
+                      <div class="dropdown-divider"></div> 
+                      <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                      <div class="dropdown-divider"></div> <!-- Divider between links -->
+                      <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
+                  </div>
+              </li>
+      
+                <!-- Add more nav items as needed -->
+              </ul>
+            </div>
+          </nav>
+
+<div class="tv-container" style="background-color: white;">
+  <!-- Sidebar for Labs -->
+  <div class="tv-sidebar">
+    <h5>Labs</h5>
+    <ul class="list-group" id="labs-tab" role="tablist">
+      <!-- Dynamically generated lab tabs -->
+      {% for lab in session.get('labs') %}
+      <li class="list-group-item group-item placeholder non-selectable" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" value="{{lab[0]}}">{{lab[1]}}</li>
+      {% endfor %}
+      <!-- Add more lab tabs here -->
+    </ul>
+  </div>
+
+  <!-- Sidebar for Groups -->
+  <div class="tv-sidebar">
+    <h5>Groups</h5>
+    <ul class="list-group" id="groups-list">
+      <!-- Dynamically generated group items -->
+      <!-- Add more group items here -->
+    </ul>
+  </div>
+
+  <div class="tv-sidebar">
+    <h5 id="groupAndLab">QR Codes for</h5>
+    <ul class="list-group" id="labs-tab" role="tablist">
+      <!-- Dynamically generated lab tabs -->
+      {% for lab in session.get('labs') %}
+      <li class="list-group-item group-item placeholder non-selectable" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" value="{{lab[0]}}">{{lab[1]}}</li>
+      {% endfor %}
+      <!-- Add more lab tabs here -->
+    </ul>
+  </div>
+
+</div>
+
+<div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/api/create_lab" method="POST">
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                  <label for="Group" style="font-weight: bold;">Lab Name:</label>
+                </div><div class="col-md-9">
+                  <input type="text" class="form-control" id="lab_name" name="lab_name" placeholder="Enter Lab Name" control-id="ControlID-4">
+                </div>
+              </div>
+        </div>
+
+        <input type="hidden" name="returnTo" value="labPage">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+   <!-- Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/api/create_group" method="POST">
+  
+            <div class="form-group">
+              <label for="labSelect">Lab</label>
+              <!-- Dynamic lab select menu -->
+              <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroupsModal()">
+                <option selected>Select a Lab</option>
+                {% for lab in session.get('labs') %}
+                <option value="{{lab[0]}}">{{lab[1]}}</option>
+                {% endfor %}
+                <!-- Lab options will be dynamically populated here -->
+              </select>
+            </div>
+  
+            
+            <div class="form-group">
+              <label for="grpSelect">Group</label>
+              <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
+            </div> 
+        </div>
+
+        <input type="hidden" name="returnTo" value="labPage">
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // Add event listener to group items to switch tabs and display QR codes
+  document.querySelectorAll('.group-item').forEach(item => {
+    item.addEventListener('click', event => {
+      const labId = document.querySelector('.tab-pane.active').id;
+      const groupId = event.target.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+      const tabId = `${labId}-${groupId}`;
+
+      // Activate corresponding tab
+      document.querySelector(`#${tabId}`).classList.add('active');
+      document.querySelector(`#${tabId}`).classList.add('show');
+      document.querySelector(`#${tabId}-tab`).classList.add('active');
+
+      // Deactivate other tabs
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        if (pane.id !== tabId) {
+          pane.classList.remove('active');
+          pane.classList.remove('show');
+        }
+      });
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') !== `#${tabId}`) {
+          link.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // Add event listener to QR code items to show details
+  document.querySelectorAll('.qr-code').forEach(qrCode => {
+    qrCode.addEventListener('click', event => {
+      // Handle QR code click event
+    });
+  });
+
+  var groups = JSON.parse('{{ session['groups'] | tojson | safe}}');
+
+    function populateGroups(id) {
+        //var lab = document.getElementById("lab_select");
+        var group_select = document.getElementById("groups-list");
+
+        var listItems = document.querySelectorAll('.placeholder')
+        listItems.forEach(function(li) {
+            li.classList.remove('selected');
+        });
+
+        var selected = document.getElementById(id); 
+        selected.classList.add('selected');
+
+        //var selectedLab = lab.value; 
+
+        group_select.innerHTML = ""; 
+
+        var labData = groups[id]
+        if (labData && labData.groups) {
+            var groupOptions = labData.groups;
+            for (var i = 0; i < groupOptions.length; i++) {
+                var optionEl = document.createElement("li");
+                optionEl.classList.add("list-group-item")
+                optionEl.classList.add("placeholder2")
+                optionEl.classList.add("group-item")
+                optionEl.classList.add("non-selectable")
+                optionEl.setAttribute("onclick", "select(this)");
+                optionEl.value = groupOptions[i].id;
+                optionEl.textContent = groupOptions[i].name; 
+                group_select.appendChild(optionEl);
+            }
+        }
+
+        userText = document.getElementById("groupAndLab")
+        userText.innerHTML = "QR Codes for " + selected.innerHTML + " : "; 
+    }
+
+    function select(item) {
+        var listItems = document.querySelectorAll('.placeholder2')
+        listItems.forEach(function(li) {
+            li.classList.remove('selected');
+        });
+
+        // Add 'selected' class to the clicked list item
+        item.classList.add('selected');
+
+        userText = document.getElementById("groupAndLab")
+        substr = userText.innerHTML.substring(0,userText.innerHTML.indexOf(':') + 2); 
+        userText.innerHTML = substr + item.innerHTML
+    }
+
+    function populateGroupsModal() {
+        var lab = document.getElementById("lab_select");
+        var group_select = document.getElementById("group_select");
+
+        var selectedLab = lab.value; 
+
+        group_select.innerHTML = ""; 
+
+        var labData = groups[selectedLab]
+        if (labData && labData.groups) {
+            var groupOptions = labData.groups;
+            for (var i = 0; i < groupOptions.length; i++) {
+                var optionEl = document.createElement("option");
+                optionEl.value = groupOptions[i].id;
+                optionEl.textContent = groupOptions[i].name; 
+                group_select.appendChild(optionEl);
+            }
+        }
+    }
+
+    function createLab() {
+        $("#createLabModal").modal("toggle"); 
+    }
+
+    function createGroup() {
+        $("#createGroupModal").modal("toggle");
+    }
+
+
+
+</script>
+
+</body>
+</html>
