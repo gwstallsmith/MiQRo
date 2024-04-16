@@ -157,10 +157,14 @@
 
             <button class="btn btn-primary btn-xl text-uppercase" value="submit" id="submit" type="submit">Submit codes</button>
         </form>  
-
+        <a href="{{ url_for('static', filename=file_name) }}" download="{{ file_name }}" class="btn btn-primary">Download PDF</a>
+        <br>
         <hr>
-        <img src="{{ url_for('static', filename=file_name) }}">
 
+        <object data="{{ url_for('static', filename=file_name) }}" type="application/pdf" width="80%" height="1000px">
+            
+            <p>It appears you don't have a PDF plugin for this browser. You can <a href="{{ url_for('static', filename=file_name) }}">click here to download the PDF file.</a></p>
+        </object>
     </body>
 
 </html>

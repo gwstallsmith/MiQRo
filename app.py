@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from PIL import Image
+from PIL import Image, ImageDraw
 import io
 import tempfile
 import os
@@ -158,6 +158,8 @@ def generate_qr_code():
     qr_size = int(request.form['code_size'])
     border_size = 1
 
+    qr_width = 32
+
     qr_codes = []  # List to store QR code PIL images
 
     # Loop to generate QR codes
@@ -169,7 +171,7 @@ def generate_qr_code():
             border=border_size,
         )
 
-        QRs.create(qr_id = str(i))
+        QRs.create(qr_id=str(i))
 
         qr.add_data(str(i))
         qr.make(fit=True)
@@ -179,27 +181,27 @@ def generate_qr_code():
     rows = int((number_of_codes - 1) / 6) + 1
     cols = min(number_of_codes, 6)
 
-    total_width = int(qr_size * 32 + border_size/2) * cols
-    total_height = int(qr_size * 32 + border_size) * rows
+    total_width = max(816, int(qr_size * qr_width + border_size/2) * cols + qr_width)
+    total_height = max(1056, int(qr_size * qr_width + border_size) * rows + qr_width)
 
+    # Create a new image with a white background
     combined_image = Image.new('RGB', (total_width, total_height), color='white')
 
 
     for i, qr_code_img in enumerate(qr_codes):
-        row = int(i/cols)
+        row = int(i / cols)
         col = i % cols
 
-        x_offset = col * (qr_size * 32 + border_size)
-        y_offset = row * (qr_size * 32 + border_size)
+        x_offset = col * (qr_size * qr_width + border_size) + qr_width
+        y_offset = row * (qr_size * qr_width + border_size) + qr_width
 
         combined_image.paste(qr_code_img, (x_offset, y_offset))
 
-    # Save the combined image
-    file_name = 'qr.png'
-    combined_image.save('static/' + file_name)
+    # Save the combined image as PDF
+    file_name = 'qr.pdf'
+    combined_image.save('static/' + file_name, 'PDF', resolution=100.0)
 
     return render_template('qr.html', file_name=file_name)
-
  
 @app.route("/logout")
 def logout():
