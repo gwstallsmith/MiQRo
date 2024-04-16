@@ -39,6 +39,7 @@ import random
 import string
 
 import qrcode
+import segno
 
 load_dotenv()
 
@@ -172,10 +173,18 @@ def scan():
         if file:
             image_bytes = file.read()
             image = Image.open(io.BytesIO(image_bytes))
+
+            #png_image = image.convert('RGBA')
+
             temp_dir = tempfile.mkdtemp()
             temp_file_path = os.path.join(temp_dir, 'temp.png')
-            image.save(temp_file_path)
-            img, ids, coordinate_map = do_stuff(temp_file_path, "./outputs")
+            image.save(temp_file_path, 'PNG')
+            try:
+                img, ids, coordinate_map = do_stuff(temp_file_path, "./outputs")
+            except Exception as e:
+                os.remove(temp_file_path)
+                shutil.rmtree(temp_dir, ignore_errors=True)
+                return render_template('fetch.html', message='Error processing image', session=session)
 
             os.remove(temp_file_path)
             shutil.rmtree(temp_dir, ignore_errors=True)
@@ -196,7 +205,7 @@ def scan():
             session['squares'] = coordinate_map
 
             
-            return render_template('fetch.html', message='File uploaded successfully', session = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
+            return render_template('fetch.html', message='File uploaded successfully', session=session, user = session.get("user"), img = encoded, ids=ids, squares = coordinate_map, qr_data = qr_data, selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
     
     if 'img' in session and 'ids' in session and 'squares' in session :
         qr_values = list(session['ids'].values())
@@ -204,9 +213,9 @@ def scan():
         qr_data = QRs.select().where((QRs.qr_id.in_(qr_values)) & (QRs.group_id == list(session["selectedGroup"].keys())[0]))
         qr_data = qr_data.execute()
         #qr_data = QRs.get_or_none(QRs.qr_id.in_(qr_values), QRs.group_id == session["selectedGroup"])
-        return render_template('fetch.html', session=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data,  selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
+        return render_template('fetch.html', session = session, user=session.get("user"), img = session['img'], ids = session['ids'], squares = session['squares'], qr_data = qr_data,  selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
     
-    return render_template('fetch.html',  selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
+    return render_template('fetch.html', session=session, selected_group = list(session["selectedGroup"].values())[0], selected_lab= list(session["selectedLab"].values())[0])
 
 
 @app.route('/set/labandgroup', methods=['POST'])
@@ -780,19 +789,24 @@ def generate_qr_code():
 
     # Loop to generate QR codes
     for i in range(get_highest_qr_id(), number_of_codes + get_highest_qr_id()):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=qr_size,
-            border=border_size,
-        )
+        #qr = qrcode.QRCode(
+        #    version=40,
+        #    error_correction=qrcode.constants.ERROR_CORRECT_M,
+        #    box_size=qr_size,
+        #    border=border_size,
+        #)
 
+        #QRs.create(qr_id=str(i))
+
+        #qr.add_data(str(i))
+        #qr.make(fit=True)
+        #img = qr.make_image(fill_color="black", back_color="white")
+        #qr_codes.append(img)  # Append QR code image to list
+
+        qr = segno.make(str(i), micro=True)
         QRs.create(qr_id=str(i))
-
-        qr.add_data(str(i))
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-        qr_codes.append(img)  # Append QR code image to list
+        img = qr.to_pil(scale=qr_size)
+        qr_codes.append(img)
 
     rows = int((number_of_codes - 1) / 6) + 1
     cols = min(number_of_codes, 6)

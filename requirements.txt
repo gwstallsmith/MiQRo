@@ -36,3 +36,5 @@ zipp==3.17.0
 redis
 Flask-Session
 qrcode[pil]
+segno
+qrcode-artistic

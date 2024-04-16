@@ -71,13 +71,23 @@ def do_stuff(imgPath, output):
     #Load Failed MicroQRCode Data
     #print(jsonFailPath)
     failData = json.load(open(jsonFailPath))
-    #print(failData.items())
+    failDataExists = False
+    for file,MQRCode in failData.items():   
+        for MQRName,MQRCodeBounds in MQRCode.items():
+            failDataExists = True
+            break
+   
+    if failDataExists == False:
+        return create_svg(json.load(open(jsonPath)), outputPath, imgpath)
+
+
     #Get Position pattern of each failed microQR
     increment = 0
     minXArr = []
     minYArr = []
     for file,MQRCode in failData.items():   
         for MQRName,MQRCodeBounds in MQRCode.items():
+            print("FAINGIN BOX", flush=True)
             bounding_box = MQRCodeBounds["BoundingBox"]
             coordinates = [
                 (int(bounding_box["Point1"]["x"]), int(bounding_box["Point1"]["y"])),
@@ -137,7 +147,10 @@ def do_stuff(imgPath, output):
             SR.append([None])
             increment += 1
     SR.pop(len(SR)-1)
-    maxW = max(max([img[0].shape[1],img[1].shape[1]]) for img in SR)
+    try: 
+        maxW = max(max([img[0].shape[1],img[1].shape[1]]) for img in SR)
+    except:
+        pass
     SRnew = [] # New list of images
     height = []  #The subsequent "height" that each image ends at
     scale = [] # The scale factor on each image to vertically concatenate
@@ -161,6 +174,7 @@ def do_stuff(imgPath, output):
     failimgPath = outputPath+"/TestImage123.png"
     #Save image concatenation
     cv2.imwrite(failimgPath,totalImg,params=None) 
+
     #Scan new image for micro qr codes
     os.system("java -jar \""+scannerPath+"\" BatchScanMicroQrCodes -i \""+failimgPath+"\" -o \""+outputPath+"/"+"TestImage123"+".json\"") 
     #The json file with the new set of scans
@@ -250,7 +264,6 @@ def calculate_text_position(coordinates, text, font_size, spacing):
     return new_x, new_y
 
 
-# noinspection PyPackageRequirements
 def create_svg(jsonData, output_path, image_path):
     #print("JSON FILE", jsonFile)
     #with open(jsonFile, 'r') as json_file:
@@ -295,8 +308,7 @@ def create_svg(jsonData, output_path, image_path):
                     text_x, text_y = calculate_text_position(coordinates, data_text, font_size=16, spacing=10)
 
                     # Add a polygon to the SVG
-                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(205, 0, 0, '%'), fill='none',
-                                        ))
+                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(255, 0, 0, '%'), fill='none'))
 
                     # Add text to the SVG with the adjusted position
                     dwg.add(dwg.text(data_text, insert=(text_x, text_y),
