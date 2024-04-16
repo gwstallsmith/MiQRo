@@ -246,14 +246,14 @@
               {% if lab[3] %}
               <form action="/api/deleteLab" method="POST" onsubmit="return confirm('Are you sure you want to delete this lab?');">
                   <button type="button" class="btn btn-primary btn-sm ml-2" onclick="labInfo('{{ lab[2] }}')">Info</button>
-                  <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Delete</button>
+                  <button type="submit" class="btn btn-outline-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Delete</button>
               </form>
               {% endif %}
           </div>
           {% if not lab[3] %}
           <div>
             <form action="/api/leaveLab" method="POST" onsubmit="return confirm('Are you sure you want to leave this lab?');">
-                <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Leave</button>
+                <button type="submit" class="btn btn-outline-dark btn-sm ml-2" name="action" value="{{lab[0]}}">Leave</button>
             </form>
             </div>
             {% endif %}
