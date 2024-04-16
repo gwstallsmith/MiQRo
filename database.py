@@ -29,6 +29,7 @@ class Users(BaseModel):
 class Labs(BaseModel):
     lab_id = AutoField(primary_key=True)
     lab_name = CharField()
+    invite_code = CharField()
 
 class Lab_Permissions(BaseModel):
     user_id = ForeignKeyField(Users, backref="labs")
@@ -40,7 +41,7 @@ class Groups(BaseModel):
     group_id = AutoField(primary_key=True)
     group_name = CharField()
 
-class QRs(BaseModel):
+class QRs(BaseModel):   
     qr_id = CharField()
     group_id = CharField()
     attr_0 = CharField()

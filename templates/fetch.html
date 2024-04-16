@@ -163,12 +163,19 @@
           <li class="nav-item active">
             <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Labs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
-          </li>
+          <li class="nav-item dropdown"> <!-- Added dropdown class -->
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Labs
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{url_for('labsPage')}}">View Labs</a>
+                <div class="dropdown-divider"></div> 
+                <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                <div class="dropdown-divider"></div> <!-- Divider between links -->
+                <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
+            </div>
+        </li>
+
           <!-- Add more nav items as needed -->
         </ul>
       </div>

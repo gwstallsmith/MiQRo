@@ -5,6 +5,7 @@ import tempfile
 import os
 from peewee import *
 import re
+import peewee
 
 import json
 from os import environ as env
@@ -34,6 +35,8 @@ import json
 
 from collections import defaultdict
 from redis import Redis
+import random 
+import string
 
 import qrcode
 
@@ -99,6 +102,7 @@ def callback():
     session["user_id"] = user.user_id
     session["labs"] = getUserLabs()
     session["groups"] = getUserGroups()
+    session["name"] = session["user"]["userinfo"]["given_name"]
     return redirect(url_for("homepage"))
 
 
@@ -334,6 +338,51 @@ def editQRData() :
 
         return redirect(url_for("scan"))
     
+@app.route('/editQRDatalp', methods=['POST'])
+def editQRDataLabPage() : 
+    if 'user' not in session: 
+        return redirect(url_for("main"))
+    if request.method == 'POST' :
+
+        qr_id_ = request.form['QR_ID']
+        group = request.form['groupID']
+
+        if request.form['action'] == "save" :
+
+            #print("QR_ID", qr_id, flush=True)
+
+            qr = QRs.get((QRs.qr_id == qr_id_) & (QRs.group_id == group))
+
+            if request.form['attr_0'] != "" :
+                qr.attr_0 = request.form['attr_0']
+            if request.form['attr_1'] != "" :
+                qr.attr_1 = request.form['attr_1']
+            if request.form['attr_2'] != "" :
+                qr.attr_2 = request.form['attr_2']
+            if request.form['attr_3'] != "" :
+                qr.attr_3 = request.form['attr_3']
+            if request.form['attr_4'] != "" :
+                qr.attr_4 = request.form['attr_4']
+            if request.form['attr_5'] != "" :
+                qr.attr_5 = request.form['attr_5']
+            if request.form['attr_6'] != "" :
+                qr.attr_6 = request.form['attr_6']
+            if request.form['attr_7'] != "" :
+                qr.attr_7 = request.form['attr_7']
+            if request.form['attr_8'] != "" :
+                qr.attr_8 = request.form['attr_8']
+            if request.form['attr_9'] != "" :
+                qr.attr_9 = request.form['attr_9']
+
+            qr.save()
+
+        if request.form['action'] == "delete" :
+            deleteQuery = QRs.delete().where((QRs.qr_id == qr_id_) & (QRs.group_id == group))
+            deleteQuery.execute()
+
+
+        return redirect(url_for("labsPage"))
+    
 
 @app.route('/addQRData', methods=['POST'])
 def addQRData() :
@@ -383,9 +432,23 @@ def labsPage() :
     if 'user' not in session:
         return redirect(url_for("main"))
     
+    query = (QRs
+             .select(QRs.group_id, QRs.qr_id, QRs.attr_0, QRs.attr_1, QRs.attr_2,
+                     QRs.attr_3, QRs.attr_4, QRs.attr_5, QRs.attr_6,
+                     QRs.attr_7, QRs.attr_8, QRs.attr_9)
+             .join(Groups, on=(QRs.group_id == Groups.group_id))
+             .order_by(QRs.group_id))
 
+    qr_data_by_group = {}
+    for qr in query:
+        group_id = qr.group_id
+        qr_info = [qr.qr_id, qr.attr_0, qr.attr_1, qr.attr_2, qr.attr_3,
+                   qr.attr_4, qr.attr_5, qr.attr_6, qr.attr_7, qr.attr_8, qr.attr_9]
+        if group_id not in qr_data_by_group:
+            qr_data_by_group[group_id] = []
+        qr_data_by_group[group_id].append(qr_info)
     
-    return render_template("labs.html", session = session)
+    return render_template("labs.html", session = session, qr_data = qr_data_by_group)
 
 
 # ==========================================================================
@@ -446,14 +509,52 @@ def userLogin():
 #@app.route('/api/getUserLabs', methods=['GET'])
 def getUserLabs() :
     query = (Labs
-             .select(Labs.lab_id, Labs.lab_name)
+             .select(Labs.lab_id, Labs.lab_name, Labs.invite_code)
              .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
              .where(Lab_Permissions.user_id == session['user_id']))
     
-    labs = [(lab.lab_id, lab.lab_name) for lab in query]
+    query2 = (Lab_Permissions.select(Lab_Permissions.lab_id, Lab_Permissions.lab_admin)
+              .where(Lab_Permissions.user_id == session['user_id']))
+    
 
+    
+    labs = [[lab.lab_id, lab.lab_name, lab.invite_code] for lab in query]
+
+    admin_labs = [(lab.lab_id, lab.lab_admin) for lab in query2]
+
+    lab_admins_dict = {lab_id: isAdmin for lab_id, isAdmin in admin_labs}
+
+    for lab in labs:
+        lab_id = lab[0]
+        lab.append(lab_admins_dict.get(lab_id, False))
 
     return labs
+
+@app.route('/api/getUserLabsD', methods=['GET'])
+def getUserLabsD() :
+    query = (Labs
+             .select(Labs.lab_id, Labs.lab_name, Labs.invite_code)
+             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
+             .where(Lab_Permissions.user_id == session['user_id']))
+    
+    query2 = (Lab_Permissions.select(Lab_Permissions.lab_id, Lab_Permissions.lab_admin)
+              .where(Lab_Permissions.user_id == session['user_id']))
+    
+
+    
+    labs = [[lab.lab_id, lab.lab_name, lab.invite_code] for lab in query]
+
+    admin_labs = [(lab.lab_id, lab.lab_admin) for lab in query2]
+
+    lab_admins_dict = {lab_id: isAdmin for lab_id, isAdmin in admin_labs}
+
+    for lab in labs:
+        lab_id = lab[0]
+        lab.append(lab_admins_dict.get(lab_id, False))
+
+
+
+    return {"Result":labs}
 
 @app.route('/api/getUserGroups')
 def getUserGroups() :
@@ -539,6 +640,14 @@ def get_lab_permissions():
 def create_lab():
     lab_name = request.form.get('lab_name')
 
+    invite_code_ = ''.join(random.choices(string.ascii_uppercase, k=5))
+
+    existing_lab = Labs.select().where(Labs.invite_code == invite_code_).first()
+
+    while existing_lab is not None :
+        invite_code_ = ''.join(random.choices(string.ascii_uppercase, k=5))
+        existing_lab = Labs.select().where(Labs.invite_code == invite_code_).first()
+
     if not lab_name:
         return {'error': 'Invalid lab name'}, 400
 
@@ -549,7 +658,7 @@ def create_lab():
     except Users.DoesNotExist:
         return {'error:' 'Invalid User'}, 400
     
-    lab = Labs.create(lab_name = lab_name)
+    lab = Labs.create(lab_name = lab_name, invite_code = invite_code_)
 
     print("USERID: ", int(user_id_), flush=True)
 
@@ -562,6 +671,29 @@ def create_lab():
         return redirect(url_for("labsPage"))
     else:
         return redirect(url_for('homepage'))
+    
+@app.route('/api/join_lab', methods=['POST'])
+def join_lab():
+    invite_code = request.form.get('invite_code')
+
+    lab = Labs.select().where(Labs.invite_code == invite_code).first()
+
+    if lab :
+        new_lab, created = Lab_Permissions.get_or_create(user_id = session["user_id"], lab_id = lab.lab_id, lab_admin = False)
+
+    session['labs'] = getUserLabs()
+    
+
+    return redirect(url_for('labsPage'))
+
+#@app.route('/api/deleteLab', methods=['POST'])
+#def delete_lab():
+
+    #delete from labs table
+    
+
+
+
 
 @app.route("/api/create_group", methods=['GET', 'POST'])
 def create_group():
@@ -626,7 +758,7 @@ def qrbygroup():
 
     qr_data_by_group = {}
     for qr in query:
-        group_id = qr.group_id.group_id
+        group_id = qr.group_id
         qr_info = [qr.qr_id, qr.attr_0, qr.attr_1, qr.attr_2, qr.attr_3,
                    qr.attr_4, qr.attr_5, qr.attr_6, qr.attr_7, qr.attr_8, qr.attr_9]
         if group_id not in qr_data_by_group:

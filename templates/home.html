@@ -196,6 +196,8 @@
                 <a class="dropdown-item" href="{{url_for('labsPage')}}">View Labs</a>
                 <div class="dropdown-divider"></div> 
                 <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                <div class="dropdown-divider"></div> 
+                <a class="dropdown-item" href="#" onclick="joinLab()">Join a Lab</a>
                 <div class="dropdown-divider"></div> <!-- Divider between links -->
                 <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
             </div>
@@ -259,21 +261,7 @@
                         </div>
 
                         <div class="spacer" style="width: 100%; height: 20px;"></div>
-
-                        <!-- Column card button, second-->
-                        <div class="card" style="width: 18rem;">
-                          <div class="card-body">
-                            <h5 class="card-title">Upload QR Data</h5>
-                            <p class="card-text">
-                              Transform and secure laboratory data to be safely stored away for any-time access.
-                            </p>
-    
-                            <!-- Button trigger choose group modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#chooseGroupModal" data-action="create" id="createButton">
-                              Upload QR Code
-                            </button>
-                          </div>
-                        </div>
+                      
 
                       </div>
                     </div>
@@ -412,6 +400,39 @@
                   <input type="text" class="form-control" id="lab_name" name="lab_name" placeholder="Enter Lab Name" control-id="ControlID-4">
                 </div>
               </div>
+              
+        </div>
+
+        <input type="hidden" name="returnTo" value="homePage">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="joinLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/api/join_lab" method="POST">
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                  <label for="Group" style="font-weight: bold;">Invite Code:</label>
+                </div><div class="col-md-9">
+                  <input type="text" class="form-control" id="invite_code" name="invite_code" placeholder="Enter Lab Name" control-id="ControlID-4">
+                </div>
+              </div>
+              
         </div>
 
         <input type="hidden" name="returnTo" value="homePage">
@@ -496,6 +517,10 @@
 
     function createLab() {
         $("#createLabModal").modal("toggle"); 
+    }
+
+    function joinLab() {
+        $("#joinLabModal").modal("toggle"); 
     }
 
     function createGroup() {

@@ -227,7 +227,15 @@
     <ul class="list-group" id="labs-tab" role="tablist">
       <!-- Dynamically generated lab tabs -->
       {% for lab in session.get('labs') %}
-      <li class="list-group-item group-item placeholder non-selectable" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" value="{{lab[0]}}">{{lab[1]}}</li>
+      <li class="list-group-item group-item placeholder non-selectable" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" data-lab-name="{{lab[1]}}">
+        {{lab[1]}}
+        {% if lab[3] %}
+        <button type="button" class="btn btn-primary btn-sm ml-2" onclick="labInfo('{{ lab[2] }}')">Info</button>
+        <form action="/api/deleteLab" method="POST">
+        <button type="submit" class="btn btn-danger btn-sm ml-2" name="{{lab[0]}}">Delete</button>
+        </form>
+        {% endif %}
+    </li>
       {% endfor %}
       <!-- Add more lab tabs here -->
     </ul>
@@ -244,11 +252,9 @@
 
   <div class="tv-sidebar">
     <h5 id="groupAndLab">QR Codes for</h5>
-    <ul class="list-group" id="labs-tab" role="tablist">
+    <ul class="list-group" id="qr_data_" role="tablist">
       <!-- Dynamically generated lab tabs -->
-      {% for lab in session.get('labs') %}
-      <li class="list-group-item group-item placeholder non-selectable" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" value="{{lab[0]}}">{{lab[1]}}</li>
-      {% endfor %}
+      
       <!-- Add more lab tabs here -->
     </ul>
   </div>
@@ -329,6 +335,87 @@
     </div>
   </div>
 
+  <!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="defineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="defineModalLabel">Define QR data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+  
+      
+          <form id="dynamic-modal-form" action="/editQRDatalp" method="post">
+            <div class="form-group row">
+              <div class="col-md-3">
+                <label for="QR ID" style="font-weight: bold;">QR ID</label>
+              </div>
+              <div class="col-md-9">
+                <select class="form-control" id="QR_ID" name="QR_ID" control-id="ControlID-3">
+    
+                </select>
+              </div>
+            </div>
+            {% for i in range(10) %}
+            <div class="form-group row">
+              <div class="col-md-3">
+                <label for="Group" style="font-weight: bold;">Attribute {{loop.index}}</label>
+              </div><div class="col-md-9">
+                <input type="text" class="form-control" id="attr_{{loop.index0}}" name="attr_{{loop.index0}}" placeholder="Enter Attribute" control-id="ControlID-4">
+              </div>
+            </div>
+            {% endfor %}
+         
+        </div>
+        
+        <input type="hidden" id="groupID" name="groupID">
+
+        <div class="modal-footer">
+            <div class="mr-auto">
+                <button type="submit" name="action" class="btn btn-danger" value="delete" onclick="return confirm('Are you sure you want to delete this QR Code?')">Delete</button>
+            </div>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" name="action" value="save" class="btn btn-primary">Save</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="inviteCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Lab Info</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                    <div class="col-md-3">
+                        <label for="Group" style="font-weight: bold;">Invite Code:</label>
+                    </div>
+                    <div class="col-md-9">
+                        <span id="show_invite_code"></span>
+                    </div>
+              </div>
+        </div>
+
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
 <!-- Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
@@ -403,8 +490,11 @@
             }
         }
 
+        var qrList = document.getElementById("qr_data_");
+        qrList.innerHTML = "";
+
         userText = document.getElementById("groupAndLab")
-        userText.innerHTML = "QR Codes for " + selected.innerHTML + " : "; 
+        userText.innerHTML = "QR Codes for " + selected.dataset.labName + " : "; 
     }
 
     function select(item) {
@@ -419,6 +509,57 @@
         userText = document.getElementById("groupAndLab")
         substr = userText.innerHTML.substring(0,userText.innerHTML.indexOf(':') + 2); 
         userText.innerHTML = substr + item.innerHTML
+
+        var qrList = document.getElementById("qr_data_");
+        qrList.innerHTML = "";
+
+        var qrData = {{qr_data | tojson }}; 
+
+        for (var key in qrData) {
+            if (qrData.hasOwnProperty(key)) {
+                if (key == item.value) {
+                    var qrListItems = qrData[key];
+                    for (var i = 0; i < qrListItems.length; i++) {
+                        var listItem = document.createElement('li');
+                        listItem.setAttribute('style', 'white-space: pre;');
+                        listItem.classList.add("list-group-item");
+                        listItem.classList.add("group-item");
+                        listItem.classList.add("non-selectable");
+                        listItem.id = qrListItems[i][0]; 
+                        listItem.setAttribute("onclick", "editQR(this," + key + ")")
+                        for (var j = 0; j < qrListItems[i].length; j++) {
+                            if (j==0) {
+                                listItem.innerHTML = "<b>ID: " + qrListItems[i][j] + "</b>\n"
+                            }
+                            else {
+                                if (qrListItems[i][j] != "") {
+                                    listItem.innerHTML += "<b>Attribute " + j + "</b>: " + qrListItems[i][j] + "\r\n"; 
+                                }
+                            }
+                        }
+                        qrList.appendChild(listItem);
+                    }
+                }
+            }
+        }
+    }
+
+    function editQR(item, key) {
+
+        selectQRID = document.getElementById("QR_ID")
+        selectQRID.innerHTML = ""
+        newOption = document.createElement("option")
+        newOption.id = item.id
+        newOption.value = item.id
+        newOption.innerHTML = item.id
+
+        groupInput = document.getElementById("groupID")
+        groupInput.value = key
+
+        selectQRID.appendChild(newOption)
+
+
+        $("#editModal").modal('toggle');
     }
 
     function populateGroupsModal() {
@@ -447,6 +588,11 @@
 
     function createGroup() {
         $("#createGroupModal").modal("toggle");
+    }
+
+    function labInfo(code) {
+        document.getElementById("show_invite_code").innerHTML = code
+        $("#inviteCodeModal").modal("toggle"); 
     }
 
 
