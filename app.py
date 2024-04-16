@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from PIL import Image, ImageDraw
+from PIL import Image
 import io
 import tempfile
 import os
@@ -137,72 +137,7 @@ def render_create_group():
 def edit_data():
     return render_template('editdata.html')
 
-@app.route("/generate_qrs")
-def render_generate_qrs():
-    return render_template('qr.html')
 
-def get_highest_qr_id():
-    highest_qr_id = QRs.select(fn.MAX(SQL('CAST(qr_id AS UNSIGNED)')))
-    highest_qr_id = highest_qr_id.scalar()
-    
-    if highest_qr_id is not None:
-        return int(highest_qr_id) + 1
-    else:
-        return 1
-
-
-
-@app.route('/generate_codes', methods=['GET', 'POST'])
-def generate_qr_code():
-    number_of_codes = int(request.form['number_of_codes'])
-    qr_size = int(request.form['code_size'])
-    border_size = 1
-
-    qr_width = 32
-
-    qr_codes = []  # List to store QR code PIL images
-
-    # Loop to generate QR codes
-    for i in range(get_highest_qr_id(), number_of_codes + get_highest_qr_id()):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=qr_size,
-            border=border_size,
-        )
-
-        QRs.create(qr_id=str(i))
-
-        qr.add_data(str(i))
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-        qr_codes.append(img)  # Append QR code image to list
-
-    rows = int((number_of_codes - 1) / 6) + 1
-    cols = min(number_of_codes, 6)
-
-    total_width = max(816, int(qr_size * qr_width + border_size/2) * cols + qr_width)
-    total_height = max(1056, int(qr_size * qr_width + border_size) * rows + qr_width)
-
-    # Create a new image with a white background
-    combined_image = Image.new('RGB', (total_width, total_height), color='white')
-
-
-    for i, qr_code_img in enumerate(qr_codes):
-        row = int(i / cols)
-        col = i % cols
-
-        x_offset = col * (qr_size * qr_width + border_size) + qr_width
-        y_offset = row * (qr_size * qr_width + border_size) + qr_width
-
-        combined_image.paste(qr_code_img, (x_offset, y_offset))
-
-    # Save the combined image as PDF
-    file_name = 'qr.pdf'
-    combined_image.save('static/' + file_name, 'PDF', resolution=100.0)
-
-    return render_template('qr.html', file_name=file_name)
- 
 @app.route("/logout")
 def logout():
     session.clear()
@@ -684,16 +619,62 @@ def join_lab():
         new_lab, created = Lab_Permissions.get_or_create(user_id = session["user_id"], lab_id = lab.lab_id, lab_admin = False)
 
     session['labs'] = getUserLabs()
+    session['groups'] = getUserGroups()
     
 
     return redirect(url_for('labsPage'))
 
-#@app.route('/api/deleteLab', methods=['POST'])
-#def delete_lab():
+@app.route('/api/deleteLab', methods=['POST'])
+def delete_lab():
 
-    #delete from labs table
-    
+    lab_id_ = request.form['action']
 
+    QRs.delete().where(QRs.group_id << Groups.select(Groups.group_id).where(Groups.lab_id == lab_id_)).execute()
+
+    # Delete rows from the Groups table
+    Groups.delete().where(Groups.lab_id == lab_id_).execute()
+
+    # Delete rows from the Lab_Permissions table
+    Lab_Permissions.delete().where(Lab_Permissions.lab_id == lab_id_).execute()
+
+    # Delete row from the Labs table
+    Labs.delete().where(Labs.lab_id == lab_id_).execute()
+
+    session['labs'] = getUserLabs()
+
+    return redirect(url_for("labsPage"))
+
+@app.route('/api/leaveLab', methods=['POST'])
+def leave_lab(): 
+
+    lab_id_ = request.form['action']
+
+    query = Lab_Permissions.delete().where((Lab_Permissions.lab_id == lab_id_) & Lab_Permissions.user_id == session["user_id"])
+    query.execute()
+
+    session['labs'] = getUserLabs()
+    session['groups'] = getUserGroups()
+
+    return redirect(url_for('labsPage'))
+
+
+
+
+
+@app.route('/api/deleteGroup', methods=['POST'])
+def delete_group():
+
+    group_id_ = request.form['action']
+
+    QRs.delete().where(QRs.group_id << Groups.select(Groups.group_id).where(Groups.group_id == group_id_)).execute()
+
+    # Delete rows from the Groups table
+    Groups.delete().where(Groups.group_id == group_id_).execute()
+
+    session['labs'] = getUserLabs()
+    session["groups"] = getUserGroups()
+
+    return redirect(url_for("labsPage"))
 
 
 
@@ -743,7 +724,6 @@ def get_qrs():
         return {'qrs: ': len(qrs)}
     
     return {'qrs: ': qrs}
-    
 
 @app.route('/getCurrentUser')
 def getCurrentUser(): 
@@ -768,6 +748,76 @@ def qrbygroup():
         qr_data_by_group[group_id].append(qr_info)
 
     return {"Result":qr_data_by_group}
+
+
+
+#GENERATION
+
+@app.route("/generate_qrs")
+def render_generate_qrs():
+    return render_template('qr_generate.html')
+
+def get_highest_qr_id():
+    highest_qr_id = QRs.select(fn.MAX(SQL('CAST(qr_id AS UNSIGNED)')))
+    highest_qr_id = highest_qr_id.scalar()
+    
+    if highest_qr_id is not None:
+        return int(highest_qr_id) + 1
+    else:
+        return 1
+
+
+
+@app.route('/generate_codes', methods=['GET', 'POST'])
+def generate_qr_code():
+    number_of_codes = int(request.form['number_of_codes'])
+    qr_size = int(request.form['code_size'])
+    border_size = 1
+
+    qr_width = 32
+
+    qr_codes = []  # List to store QR code PIL images
+
+    # Loop to generate QR codes
+    for i in range(get_highest_qr_id(), number_of_codes + get_highest_qr_id()):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=qr_size,
+            border=border_size,
+        )
+
+        QRs.create(qr_id=str(i))
+
+        qr.add_data(str(i))
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        qr_codes.append(img)  # Append QR code image to list
+
+    rows = int((number_of_codes - 1) / 6) + 1
+    cols = min(number_of_codes, 6)
+
+    total_width = max(816, int(qr_size * qr_width + border_size/2) * cols + qr_width)
+    total_height = max(1056, int(qr_size * qr_width + border_size) * rows + qr_width)
+
+    # Create a new image with a white background
+    combined_image = Image.new('RGB', (total_width, total_height), color='white')
+
+
+    for i, qr_code_img in enumerate(qr_codes):
+        row = int(i / cols)
+        col = i % cols
+
+        x_offset = col * (qr_size * qr_width + border_size) + qr_width
+        y_offset = row * (qr_size * qr_width + border_size) + qr_width
+
+        combined_image.paste(qr_code_img, (x_offset, y_offset))
+
+    # Save the combined image as PDF
+    file_name = 'qr.pdf'
+    combined_image.save('static/' + file_name, 'PDF', resolution=100.0)
+
+    return render_template('qr_generate.html', file_name=file_name)
 
 # ==========================================================================
 if __name__ == "__main__":

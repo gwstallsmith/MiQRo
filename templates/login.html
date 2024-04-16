@@ -1,25 +1,64 @@
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Auth0 Example</title>
-  </head>
-  <body>
-    <input type="password" id="inputPassword" name="password" required><br>
-
-    <form id="user-create-form" action="/api/login" method="post" enctype="multipart/form-data">
-      <!--<input class="form-control" type="text" id="name" name="name" placeholder="Your Name"><br>-->
-    
-      <input class="form-control" type="text" id="email" name="email" placeholder="Your Email"><br>
-      <input class="form-control" type="text" id="password" name="password" placeholder="Your Password"><br>
-
-        
-      <button class="btn btn-primary btn-xl text-uppercase" value="submit" id="submit" type="submit">Login</button>
-    </form>   
-
-          
-    <a href="/register" class="button">Register</a>
-    <a href="/login" id="qsLoginBtn">Login</a>
-        
-
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome To MiQR</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: System;
+      font-size: min(max(16px, 3vw), 32px);
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    .left-half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+      color: #333;
+    }
+    .right-half {
+      flex: -2;
+      background-size: cover;
+      background-position: center;
+    }
+    .heading {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .login-btn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      text-decoration: none;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: background-color 0.3s;
+    }
+    .login-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Half -->
+    <div class="left-half">
+      <h1 class="heading">Welcome To MiQR</h1>
+      <a href="/login" class="login-btn">Login</a>
+    </div>
+    <!-- Right Half (Image) -->
+    <div class="right-half">
+      <img src="{{ url_for('static', filename='biolab.jpg') }}"> 
+  </div>
+</body>
 </html>

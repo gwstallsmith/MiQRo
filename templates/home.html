@@ -202,10 +202,14 @@
                 <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
             </div>
         </li>
+        <li class="nav-item">
+          <a class="nav-link home" href="{{url_for('render_generate_qrs')}}">Create QR Codes<span class="sr-only">(current)</span></a>
+        </li>
 
           <!-- Add more nav items as needed -->
         </ul>
       </div>
+      <a class="btn btn-outline-danger ml-auto" href="{{url_for('logout')}}">Logout</a>
     </nav>
 
     <!-- Tab contents -->
@@ -217,7 +221,7 @@
           <div class="spacer" style="width: 100%; height: 20px;"></div>   <!-- Welcome user -->
           <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal"id="user_name">, </span></h2>
           <script>
-            const username = "Percival,";
+            const username = "{{session['name']}},";
             document.getElementById("user_name").innerHTML = username;
           </script>
           <div class="spacer" style="width: 100%; height: 15px;"></div>
@@ -272,9 +276,9 @@
             <div class="right-space">
                 <div class="app-bar">
                   <div class="row justify-content-between">
-                    <p style="margin: 0; font-weight: bold;">My Labs</p>
+                    <p style="margin: 0; font-weight: bold;">Shared Labs</p>
                   
-                    <a href="page_url_here" class="btn btn-light" style="margin-right: 5px; font-size: 10pt;">Go to Labs</a>
+                    <a href="{{url_for('labsPage')}}" class="btn btn-light" style="margin-right: 5px; font-size: 10pt;">Go to Labs</a>
                   </div>
                     
                 </div>
@@ -283,39 +287,24 @@
 
                       
                       <div class="fade-in-right">
-                        Scrollable Content, this is a sample list
+                        Labs that have been shared with you
                       </div>
 
                       <div class="spacer" style="width: 100%; height: 15px;"></div>
 
                       <ul class="list-group list-group-flush">
-                        <script>
-
-                          // Array containing the text for each list item
-                          const userLabs = [
-                            {name: "Biology Lab", grpCnt: 12},
-                            {name: "Quant Lab", grpCnt: 102},
-                            {name: "Chem Lab", grpCnt: 108},
-                            {name: "Organic Chem Lab", grpCnt: 104},
-                            {name: "Another Lab", grpCnt: 10},
-                          ];
-
-                          // Loop through the activityStack array and generate list items dynamically
-                          userLabs.forEach(item => {
-                              document.write(`
-                                <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
-                                  <div class="d-flex align-items-center">
-                                  
-                                    <i class="bi bi-qr-code-scan" style="color: #999;"></i>
-                                    
-                                    <span style="margin-left: 20px; font-size: 14.5px;">${item.name}</span>
-                                  </div>
-                                  <span class="badge badge-pill badge-light text-primary">${item.grpCnt}</span>
-                                </li>
-                              `);
-                            });
-
-                        </script>
+                        {% for lab in session.get('labs') %}
+                        {% if not lab[3] %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
+                          <div class="d-flex align-items-center">
+                          
+                            <i class="bi bi-qr-code-scan" style="color: #999;"></i>
+                            
+                            <span style="margin-left: 20px; font-size: 14.5px;">{{lab[1]}}</span>
+                          </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
                       </ul>
 
             
@@ -417,7 +406,7 @@
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Join a Lab</h5>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -438,7 +427,7 @@
         <input type="hidden" name="returnTo" value="homePage">
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Join</button>
         </div>
       </div>
       </form>
