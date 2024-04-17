@@ -13,7 +13,7 @@ import subprocess
 from collections import defaultdict
 
 
-def do_stuff(imgPath, output):
+def scan_qr_codes(imgPath, output):
     imgpath = imgPath
     scannerPath = "scanner/java/applications.jar"
     AIpath = "scanner/upscaleModels/ESPCN_x2.pb"
@@ -23,8 +23,9 @@ def do_stuff(imgPath, output):
     imgFile = imgpath[imgpath.rfind("/")+1:len(imgpath)]
    
 
+    #Get and set the AI upscaling model path
     cwd = os.getcwd()
-    print(cwd)
+
     sr = cv2.dnn_superres.DnnSuperResImpl_create()
     sr.readModel(AIpath)
     sr.setModel("espcn",2)
@@ -35,7 +36,7 @@ def do_stuff(imgPath, output):
     start = time.time()
     #Read Image
     img = cv2.imread(imgpath)
-    print(img)
+
    
     assert img is not None, "Image not found"
     
@@ -44,11 +45,11 @@ def do_stuff(imgPath, output):
     imgY = img.shape[0]
 
   
-
+    #Run Scanner
     java_command = f"java -jar Scanner/java/applications.jar BatchScanMicroQrCodes -i {imgpath} -o outputs/output.json"
     result = subprocess.run(java_command, shell=True, capture_output=True)
-    print(result.stdout)
-    print(result.stderr)
+
+
     #Set Json Paths
     jsonPath = "outputs/output.json"
     jsonFailPath = "outputs/outputFail.json"
@@ -61,7 +62,8 @@ def do_stuff(imgPath, output):
         for MQRName,MQRCodeBounds in MQRCode.items():
             failDataExists = True
             break
-   
+
+    #If no failed microQRs, do not run the AI upscaling
     if failDataExists == False:
         return create_svg(json.load(open(jsonPath)), outputPath, imgpath)
 
@@ -72,7 +74,7 @@ def do_stuff(imgPath, output):
     minYArr = []
     for file,MQRCode in failData.items():   
         for MQRName,MQRCodeBounds in MQRCode.items():
-            print("FAINGIN BOX", flush=True)
+
             bounding_box = MQRCodeBounds["BoundingBox"]
             coordinates = [
                 (int(bounding_box["Point1"]["x"]), int(bounding_box["Point1"]["y"])),
@@ -119,7 +121,7 @@ def do_stuff(imgPath, output):
             minXArr.append(minX)
             minYArr.append(minY)
             #Initialize sub Image
-            print(maxX-minX)
+
             subImg = img[int(minY):int(maxY),int(minX):int(maxX)]
             ##Display Sub Image
            
@@ -194,19 +196,14 @@ def do_stuff(imgPath, output):
                     (int(float(bounding_box["Point3"]["x"])*scale[increment]+minXArr[increment]), (int((float(bounding_box["Point3"]["y"])-h)*scale[increment]+minYArr[increment]))),
                     (int(float(bounding_box["Point4"]["x"])*scale[increment]+minXArr[increment]), (int((float(bounding_box["Point4"]["y"])-h)*scale[increment]+minYArr[increment])))
                 ]
-                #MQR = {"MicroQRCode"+str(increment2+noMQRs):[{"Data":newScan[increment2]},{"BoundingBox":[{"Point1":[{"x":coordinates2[0][0]},{"y":coordinates2[0][1]}]},{"Point2":[{"x":coordinates2[1][0]},{"y":coordinates2[1][1]}]},{"Point3":[{"x":coordinates2[2][0]},{"y":coordinates2[2][1]}]},{"Point4":[{"x":coordinates2[3][0]},{"y":coordinates2[3][1]}]}]}]}
                 MQR = {"Data":newScan[increment2],"BoundingBox":{"Point1":{"x":coordinates2[0][0],"y":coordinates2[0][1]},"Point2":{"x":coordinates2[1][0],"y":coordinates2[1][1]},"Point3":{"x":coordinates2[2][0],"y":coordinates2[2][1]},"Point4":{"x":coordinates2[3][0],"y":coordinates2[3][1]}}}
                 increment2 += 1
                 oldData[imgpath]["MicroQRCode"+str(increment2+noMQRs)] = MQR
                
-    #print(oldData)
+
     jsonFile.seek(0)
     json.dump(oldData, jsonFile, indent = 4)
     end = time.time()
-    print(end-start)
-
-    #print oldData
-
 
     return create_svg(oldData, outputPath, imgpath)
 
@@ -244,9 +241,6 @@ def calculate_text_position(coordinates, text, font_size, spacing):
 
 
 def create_svg(jsonData, output_path, image_path):
-    #print("JSON FILE", jsonFile)
-    #with open(jsonFile, 'r') as json_file:
-        #data = json.load(json_file)
         data = jsonData
 
         for image_name, qr_codes in data.items():
