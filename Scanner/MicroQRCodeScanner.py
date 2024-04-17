@@ -10,11 +10,9 @@ import base64
 import math
 import svgwrite
 import subprocess
+from collections import defaultdict
 
-#Get Image and Scanner Pathname
-#print("Image File")
-#imgpath = askopenfilename()
-#imgpath = "C:/users/rwojtowi_stu/desktop/testimage123.png"
+
 def do_stuff(imgPath, output):
     imgpath = imgPath
     scannerPath = "scanner/java/applications.jar"
@@ -23,19 +21,7 @@ def do_stuff(imgPath, output):
 
     imgname = imgpath[imgpath.rfind("/")+1:imgpath.rfind(".")]
     imgFile = imgpath[imgpath.rfind("/")+1:len(imgpath)]
-    #print(imgname)
-
-    #scannerPath = askopenfilename()
-
-   # print("json output directory")
-   # outputPath = askdirectory()
-    #outputPath = "C:/users/rwojtowi_stu/desktop"
-    #outputPath = input("outputPath: ")
-    #AI Upscale Model path
-   # print("AI Upscale model path")
-  #  AIpath = askopenfilename()
-    #AIpath = "C:\\Users\\rwojtowi_stu\\downloads\\espcn_x2.pb"
-    #AIpath = input("AIpath: ")
+   
 
     cwd = os.getcwd()
     print(cwd)
@@ -49,13 +35,16 @@ def do_stuff(imgPath, output):
     start = time.time()
     #Read Image
     img = cv2.imread(imgpath)
+    print(img)
+   
+    assert img is not None, "Image not found"
+    
     #show image
     imgX = img.shape[1]
     imgY = img.shape[0]
-    #Run MicroQR Scanner
-    #print(imgpath + '\n')
-    #imgpath = 'QRSamsungFar.png'
-    #print(imgpath + '\n')
+
+  
+
     java_command = f"java -jar Scanner/java/applications.jar BatchScanMicroQrCodes -i {imgpath} -o outputs/output.json"
     result = subprocess.run(java_command, shell=True, capture_output=True)
     print(result.stdout)
@@ -67,13 +56,23 @@ def do_stuff(imgPath, output):
     #Load Failed MicroQRCode Data
     #print(jsonFailPath)
     failData = json.load(open(jsonFailPath))
-    #print(failData.items())
+    failDataExists = False
+    for file,MQRCode in failData.items():   
+        for MQRName,MQRCodeBounds in MQRCode.items():
+            failDataExists = True
+            break
+   
+    if failDataExists == False:
+        return create_svg(json.load(open(jsonPath)), outputPath, imgpath)
+
+
     #Get Position pattern of each failed microQR
     increment = 0
     minXArr = []
     minYArr = []
     for file,MQRCode in failData.items():   
         for MQRName,MQRCodeBounds in MQRCode.items():
+            print("FAINGIN BOX", flush=True)
             bounding_box = MQRCodeBounds["BoundingBox"]
             coordinates = [
                 (int(bounding_box["Point1"]["x"]), int(bounding_box["Point1"]["y"])),
@@ -123,9 +122,7 @@ def do_stuff(imgPath, output):
             print(maxX-minX)
             subImg = img[int(minY):int(maxY),int(minX):int(maxX)]
             ##Display Sub Image
-            #cv2.imshow("subImage",subImg)
-            #cv2.waitKey(0)
-            ##End display
+           
             #Super Resolution
             SR[increment][0] = sr.upsample(subImg)
             #Resized x0.5
@@ -133,7 +130,10 @@ def do_stuff(imgPath, output):
             SR.append([None])
             increment += 1
     SR.pop(len(SR)-1)
-    maxW = max(max([img[0].shape[1],img[1].shape[1]]) for img in SR)
+    try: 
+        maxW = max(max([img[0].shape[1],img[1].shape[1]]) for img in SR)
+    except:
+        pass
     SRnew = [] # New list of images
     height = []  #The subsequent "height" that each image ends at
     scale = [] # The scale factor on each image to vertically concatenate
@@ -157,6 +157,7 @@ def do_stuff(imgPath, output):
     failimgPath = outputPath+"/TestImage123.png"
     #Save image concatenation
     cv2.imwrite(failimgPath,totalImg,params=None) 
+
     #Scan new image for micro qr codes
     os.system("java -jar \""+scannerPath+"\" BatchScanMicroQrCodes -i \""+failimgPath+"\" -o \""+outputPath+"/"+"TestImage123"+".json\"") 
     #The json file with the new set of scans
@@ -166,7 +167,7 @@ def do_stuff(imgPath, output):
     data = json.load(open(jsonPathTwo))
     jsonFile = open(jsonPath,"r+")
     oldData = json.load(jsonFile)
-    noMQRs = len(oldData["temp.jpg"])
+    noMQRs = len(oldData[imgpath])
     increment2 = 0
     for image_name, qr_codes in data.items():
         for qr_code_name, qr_code_data in qr_codes.items():
@@ -196,12 +197,8 @@ def do_stuff(imgPath, output):
                 #MQR = {"MicroQRCode"+str(increment2+noMQRs):[{"Data":newScan[increment2]},{"BoundingBox":[{"Point1":[{"x":coordinates2[0][0]},{"y":coordinates2[0][1]}]},{"Point2":[{"x":coordinates2[1][0]},{"y":coordinates2[1][1]}]},{"Point3":[{"x":coordinates2[2][0]},{"y":coordinates2[2][1]}]},{"Point4":[{"x":coordinates2[3][0]},{"y":coordinates2[3][1]}]}]}]}
                 MQR = {"Data":newScan[increment2],"BoundingBox":{"Point1":{"x":coordinates2[0][0],"y":coordinates2[0][1]},"Point2":{"x":coordinates2[1][0],"y":coordinates2[1][1]},"Point3":{"x":coordinates2[2][0],"y":coordinates2[2][1]},"Point4":{"x":coordinates2[3][0],"y":coordinates2[3][1]}}}
                 increment2 += 1
-                oldData["temp.jpg"]["MicroQRCode"+str(increment2+noMQRs)] = MQR
-                ###Debug
-                #print(coordinates)
-                #print(coordinates2)
-                #print(minXArr[increment])
-                #print(minYArr[increment])
+                oldData[imgpath]["MicroQRCode"+str(increment2+noMQRs)] = MQR
+               
     #print(oldData)
     jsonFile.seek(0)
     json.dump(oldData, jsonFile, indent = 4)
@@ -246,7 +243,6 @@ def calculate_text_position(coordinates, text, font_size, spacing):
     return new_x, new_y
 
 
-# noinspection PyPackageRequirements
 def create_svg(jsonData, output_path, image_path):
     #print("JSON FILE", jsonFile)
     #with open(jsonFile, 'r') as json_file:
@@ -262,12 +258,16 @@ def create_svg(jsonData, output_path, image_path):
 
             #image name only without the extension
             image_name = image_name[:image_name.rfind(".")]
-            dwg = svgwrite.Drawing(os.path.join(output_path, f"{image_name.split('.')[0]}.svg"), size=image_size)
+            dwg = svgwrite.Drawing(os.path.join(output_path, f"temp.svg"), size=image_size)
 
             # Embed the image data in the SVG
             dwg.add(dwg.image(href=f"data:image/png;base64,{image_data}", insert=(0, 0), size=image_size))
 
+            id_map = dict()
+            coordinate_map = defaultdict(list)
+
             #Pulls the coordinates from the JSON file
+            index = 1
             for qr_code_name, qr_code_data in qr_codes.items():
                 if "BoundingBox" in qr_code_data:
                     bounding_box = qr_code_data["BoundingBox"]
@@ -278,7 +278,8 @@ def create_svg(jsonData, output_path, image_path):
                         (int(bounding_box["Point4"]["x"]), int(bounding_box["Point4"]["y"]))
                     ]
                     
-                    data_text = str(calculateDistance(qr_code_data.get("Data", ""),bounding_box,image_size))
+                    #data_text = str(calculateDistance(qr_code_data.get("Data", ""),bounding_box,image_size))
+                    data_text = str(index)
                     
                     #qr_code_data.get("Data", "")  # Get the data variable
 
@@ -286,15 +287,33 @@ def create_svg(jsonData, output_path, image_path):
                     text_x, text_y = calculate_text_position(coordinates, data_text, font_size=16, spacing=10)
 
                     # Add a polygon to the SVG
-                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(205, 0, 0, '%'), fill='none',
-                                        ))
+                    dwg.add(dwg.polygon(points=coordinates, stroke=svgwrite.rgb(255, 0, 0, '%'), fill='none'))
 
                     # Add text to the SVG with the adjusted position
                     dwg.add(dwg.text(data_text, insert=(text_x, text_y),
                                      font_size=16, font_family="Arial", fill=svgwrite.rgb(255, 0, 0, '%')))
+                    
+                    #add coordiantes to coordinate map
+                    original_width, original_height = image_size
+                    new_width, new_height = (500,500)
+
+                    scale_x = new_width / original_width
+                    scale_y = new_height / original_height
+
+                    for c in coordinates :
+                        new_x = c[0] * scale_x
+                        new_y = c[1] * scale_y
+
+                        coordinate_map[qr_code_data["Data"].lstrip('0')].append((new_x, new_y))
+
+
+                    
+                    # add ID and qr data to dict
+                    id_map[index] = qr_code_data["Data"]
+                    index += 1
 
             dwg.save()
-            return 'outputs/temp.svg'
+            return 'outputs/temp.svg', id_map, coordinate_map
 def calculateDistance(data,bb,size):
     r = 1#float(data)
     x1 = int(bb["Point1"]["x"])

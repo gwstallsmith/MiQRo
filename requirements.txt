@@ -18,7 +18,7 @@ kiwisolver==1.4.5
 MarkupSafe==2.1.5
 matplotlib==3.8.3
 numpy==1.26.4
-opencv-python==4.9.0.80
+opencv-contrib-python
 packaging==23.2
 peewee==3.17.1
 pillow==10.2.0
@@ -33,3 +33,8 @@ svgwrite==1.4.3
 urllib3==2.2.1
 Werkzeug==3.0.1
 zipp==3.17.0
+redis
+Flask-Session
+qrcode[pil]
+segno
+qrcode-artistic

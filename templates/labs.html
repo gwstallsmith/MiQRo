@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MiQRo</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+       
+        <style>
+          /* Custom CSS for TV-shaped outer container */
+          html, body {
+                  margin: 0;
+                  padding: 0;
+                  font-family: Arial, sans-serif;
+                  background-color: #fff;
+              }
+      
+          .tv-container {
+            position: relative;
+            width: 100%; /* Cover entire width of the page */
+            height: 100vh; /* Cover entire height of the viewport */
+            background-color: #333; /* Dark grey background */
+            overflow: hidden;
+            border-radius: 0; /* Square outer corners */
+          }
+      
+          .tv-screen {
+            position: absolute;
+            top: 20px;
+            left: 5px;
+            right: 5px;
+            bottom: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background-color: #fff; /* White background for inner content */
+            border-radius: 20px; /* Rounded corners for inner content */
+            overflow: hidden;
+          }
+      
+          /* White text for navbar items */
+          .navbar-nav .nav-link {
+            color: #333;
+          }
+      
+          /* Padding for tab content */
+          .tab-content .tab-pane .content-wrapper {
+            padding-top: 10px; /* Top padding */
+            padding-bottom: 10px; /* Bottom padding */
+            padding-left: 15px; /* Left padding */
+            padding-right: 15px; /* Right padding */
+          }
+      
+          .container {
+                  align-items: stretch;
+                  width: 100%;
+                  height: 100vh;
+                  min-width:100%;
+                  position: relative;
+                  display: flex;
+                  padding: 0px;
+          }
+          
+          .left-space {
+                  flex: 1.2;
+                  background-color:white;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  overflow-y: auto;
+                  padding: 0px;
+                  position: relative;
+          }
+              .left-space .app-bar {
+                  position: sticky;
+                  top: 0;
+                  background-color: #F5F5F5;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  border-bottom-left-radius: 10px;
+                  border-bottom-right-radius: 10px;
+                  color: black;
+                
+                  padding-left: 20px;
+                  padding-right: 20px;
+                  padding-bottom: 10px;
+                  padding-top: 10px;
+                  z-index: 1;
+              }
+              .left-space .content {
+                  padding-top: 30px; /* Adjust padding to make space for the app bar */
+                  padding-left: 2.5px; /* Add left padding for the content */
+                  padding-right: 5px; /* Add right padding for the content */
+              }
+              .right-space {
+                  flex: 1.8;
+                  background-color: #FDFDFD;
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  overflow-y: scroll;
+                  position: relative;
+              }
+              .right-space .app-bar {
+                  position: sticky;
+                  top: 0;
+                  background-color: #357EC7; /*#316FF6 #357EC7  #2F75B2  #357EC7;  */
+                  border-top-left-radius: 10px;
+                  border-top-right-radius: 10px;
+                  color: white;
+            
+                  padding-left: 30px;
+                  padding-right: 25px;
+                  padding-top: 15px;
+                  padding-bottom: 10px;
+                  
+                  z-index: 1;
+              }
+              .right-space .content {
+                  padding-top: 25px; /* Adjust padding to make space for the app bar */
+                  padding-left: 20px; /* Add left padding for the content */
+                  padding-right: 20px; /* Add right padding for the content */
+              }
+              .divider {
+                  flex: 0 0 25px;
+                  background-color: transparent;
+              }
+              .content-wrapper {
+                padding: 0px;
+              }
+              .card-text {
+               font-size: 15px;
+              }
+      
+              .card-title {
+               font-weight: bold;
+              }
+      
+              /* Define fade-in-up animation */
+              @keyframes fade-in-up {
+                0% {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+      
+              /* Apply fade-in-up animation to list items */
+              .list-group-item {
+                animation: fade-in-up 0.5s ease-out; /* Adjust duration and timing function as needed */
+              }
+
+              .selected {
+                background-color: #007bff; /* Blue background color */
+                color: #fff; /* White text color */
+              }
+      
+              /* Define fade-in-right animation */
+              @keyframes fade-in-right {
+                0% {
+                  opacity: 0;
+                  transform: translateX(-20px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateX(0);
+                }
+              }
+      
+              /* Apply fade-in-right animation to the target text */
+              .fade-in-right {
+                animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
+              }
+
+              .non-selectable {
+                user-select: none;
+              }
+
+              .placeholder2 {
+
+              }
+
+              .alert-fixed {
+                position:fixed; 
+                top: 0px; 
+                left: 0px; 
+                width: 100%;
+                z-index:9999; 
+                border-radius:0px
+              }
+              
+      
+        </style>
+        <script src="group_choice_modal.js"></script>
+      </head>
+      <body>
+      
+      <div class="tv-container">
+        <div class="tv-screen">
+          <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand font-weight-bold" href="#">MiQRo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown"> <!-- Added dropdown class -->
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Labs
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{{url_for('labsPage')}}">View Labs</a>
+                  <div class="dropdown-divider"></div> 
+                  <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                  <div class="dropdown-divider"></div> 
+                  <a class="dropdown-item" href="#" onclick="joinLab()">Join a Lab</a>
+                  <div class="dropdown-divider"></div> <!-- Divider between links -->
+                  <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
+              </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link home" href="{{url_for('render_generate_qrs')}}">Create QR Codes<span class="sr-only">(current)</span></a>
+          </li>
+  
+            <!-- Add more nav items as needed -->
+          </ul>
+        </div>
+        <a class="btn btn-outline-danger ml-auto" href="{{url_for('logout')}}">Logout</a>
+      </nav>
+
+<div class="tv-container" style="background-color: white;">
+  <!-- Sidebar for Labs -->
+  
+  <div class="tv-sidebar" style="padding-left: 15px; padding-right: 15px;">
+    <div style="margin-top: 25px;">
+    </div>
+   
+    <h3 class="title" style="font-weight: bold;">Labs</h3>
+    <ul class="list-group" id="labs-tab" role="tablist">
+      <!-- Dynamically generated lab tabs -->
+      {% if session.get('labs')%}
+      {% for lab in session.get('labs') %}
+      <li class="list-group-item group-item placeholder non-selectable d-flex justify-content-between align-items-center" onclick="populateGroups({{lab[0]}})" id="{{lab[0]}}" data-lab-name="{{lab[1]}}">
+          <div>
+              <b>{{lab[1]}}</b>
+          </div>
+          <div>
+              {% if lab[3] %}
+              <form action="/api/deleteLab" method="POST" onsubmit="return confirm('Are you sure you want to delete this lab?');">
+                  <button type="button" class="btn btn-primary btn-sm ml-2" onclick="labInfo('{{ lab[2] }}','{{ lab[0] }}')">Info</button>
+                  <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Delete</button>
+              </form>
+              {% endif %}
+          </div>
+          {% if not lab[3] %}
+          <div>
+            <form action="/api/leaveLab" method="POST" onsubmit="return confirm('Are you sure you want to leave this lab?');">
+                <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Leave</button>
+            </form>
+            </div>
+            {% endif %}
+      </li>
+      {% endfor %}
+      {% else %}
+      <li class="list-group-item group-item placeholder non-selectable d-flex justify-content-between align-items-center">
+        <div>
+            <b>No Labs Found</b>
+        </div>
+       </li>
+       {% endif %}
+      <!-- Add more lab tabs here -->
+    </ul>
+  </div>
+
+  <!-- Sidebar for Groups -->
+  <div class="tv-sidebar" style="padding-left: 15px; padding-right: 15px;">
+    <div style="margin-top: 25px;"></div>
+    <h4 class="title" style="font-weight: bold;">Groups</h4>
+    <li class="list-group" id="groups-list">
+      <!-- Dynamically generated group items -->
+      <!-- Add more group items here -->
+    </li>
+  </div>
+
+
+  <div class="tv-sidebar" style="padding-left: 15px; padding-right: 15px;">
+    <div style="margin-top: 25px;"></div>
+    <h5  class="title" style="font-weight: bold;" id="groupAndLab">QR Codes for</h5>
+    <ul class="list-group" id="qr_data_" role="tablist">
+      <!-- Dynamically generated lab tabs -->
+      
+      <!-- Add more lab tabs here -->
+    </ul>
+  </div>
+
+
+</div>
+
+<div id="alert" class="alert-fixed alert alert-danger" style="display: none;">
+  Please fill out all fields.
+</div>
+
+<div class="modal fade" id="joinLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Join a Lab</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+        <form id="joinLabForm" action="/api/join_lab" method="POST" onsubmit="return validateForm(this)">
+
+          <div class="form-group">
+              <div class="col-md-3">
+                <label for="Group" style="font-weight: bold;">Invite Code:</label>
+              </div><div class="col-md-9">
+                <input type="text" class="form-control" id="invite_code" name="invite_code" placeholder="Enter Lab Name" control-id="ControlID-4">
+              </div>
+            </div>
+            
+
+      <input type="hidden" name="returnTo" value="homePage">
+
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" id="startScanButton" class="btn btn-primary">Join</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+        <form id="createLabForm" action="/api/create_lab" method="POST" onsubmit="return validateForm(this)">
+
+          <div class="form-group">
+              <div class="col-md-3">
+                <label for="Group" style="font-weight: bold;">Lab Name:</label>
+              </div><div class="col-md-9">
+                <input type="text" class="form-control" id="lab_name" name="lab_name" placeholder="Enter Lab Name" control-id="ControlID-4">
+              </div>
+            </div>
+            
+      </div>
+
+      <input type="hidden" name="returnTo" value="labPage">
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+   <!-- Modal -->
+   <div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="createGroupForm" action="/api/create_group" method="POST" onsubmit="return validateForm(this)">
+  
+            <div class="form-group">
+              <label for="labSelect">Lab</label>
+              <!-- Dynamic lab select menu -->
+              <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroups()">
+                <option selected>Select a Lab</option>
+                
+                {% for lab in session.get('labs') %}
+                <option value="{{lab[0]}}">{{lab[1]}}</option>
+                {% endfor %}
+                <!-- Lab options will be dynamically populated here -->
+              </select>
+            </div>
+
+            <input type="hidden" name="returnTo" value="labPage">
+  
+            
+            <div class="form-group">
+              <label for="grpSelect">Group</label>
+              <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
+            </div> 
+        </div>
+  
+        <input type="hidden" name="returnTo" value="homePage">
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="defineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="defineModalLabel">Define QR data</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+  
+      
+          <form id="dynamic-modal-form-un" action="/editQRDatalp" method="post">
+            <div class="form-group row">
+              <div class="col-md-3">
+                <label for="QR ID" style="font-weight: bold;">QR ID</label>
+              </div>
+              <div class="col-md-9">
+                <select class="form-control" id="QR_ID" name="QR_ID" control-id="ControlID-3">
+    
+                </select>
+              </div>
+            </div>
+            {% for i in range(10) %}
+            <div class="form-group row">
+              <div class="col-md-3">
+                <label for="Group" style="font-weight: bold;">Attribute {{loop.index}}</label>
+              </div><div class="col-md-9">
+                <input type="text" class="form-control" id="attr_{{loop.index0}}" name="attr_{{loop.index0}}" placeholder="Enter Attribute" control-id="ControlID-4">
+              </div>
+            </div>
+            {% endfor %}
+         
+        </div>
+        
+        <input type="hidden" id="groupID" name="groupID">
+
+        <div class="modal-footer">
+            <div class="mr-auto">
+                <button type="submit" name="action" class="btn btn-danger" value="delete" onclick="return confirm('Are you sure you want to delete this QR Code?')">Delete</button>
+            </div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="action" value="save" class="btn btn-primary">Save</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="inviteCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Lab Info</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                    <div class="col-md-3">
+                        <label for="Group" style="font-weight: bold;">Invite Code:</label>
+                    </div>
+                    <div class="col-md-9">
+                        <span id="show_invite_code"></span>
+                    </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3">
+                  <div class="col-md-3">
+                      <label for="Group" id="lab_members_header" style="font-weight: bold;">Lab Members: </label>
+                      <ul id="lab_members_list"></ul>
+                  </div>
+                  
+            </div>
+          </div>
+
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  // Add event listener to group items to switch tabs and display QR codes
+
+  /*
+  document.querySelectorAll('.group-item').forEach(item => {
+    item.addEventListener('click', event => {
+      const labId = document.querySelector('.tab-pane.active').id;
+      const groupId = event.target.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+      const tabId = `${labId}-${groupId}`;
+
+      // Activate corresponding tab
+      document.querySelector(`#${tabId}`).classList.add('active');
+      document.querySelector(`#${tabId}`).classList.add('show');
+      document.querySelector(`#${tabId}-tab`).classList.add('active');
+
+      // Deactivate other tabs
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        if (pane.id !== tabId) {
+          pane.classList.remove('active');
+          pane.classList.remove('show');
+        }
+      });
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') !== `#${tabId}`) {
+          link.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // Add event listener to QR code items to show details
+  document.querySelectorAll('.qr-code').forEach(qrCode => {
+    qrCode.addEventListener('click', event => {
+      // Handle QR code click event
+    });
+  });
+  */
+  $(document).on('hidden.bs.modal', '.modal', function () {
+      console.log("modal hidden")
+      document.getElementById("alert").style.display = "none";
+  });
+
+  var groups = JSON.parse('{{ session['groups'] | tojson | safe}}');
+  var groupName = ""
+  var labName = ""
+
+    function populateGroups(id) {
+        //var lab = document.getElementById("lab_select");
+        var group_select = document.getElementById("groups-list");
+
+        var listItems = document.querySelectorAll('.placeholder')
+        listItems.forEach(function(li) {
+            li.classList.remove('selected');
+        });
+
+        var selected = document.getElementById(id); 
+        selected.classList.add('selected');
+
+        //var selectedLab = lab.value; 
+
+        group_select.innerHTML = ""; 
+
+        var labData = groups[id]
+        var noGroups = true
+        if (labData && labData.groups) {
+            var groupOptions = labData.groups;
+            for (var i = 0; i < groupOptions.length; i++) {
+                var optionEl = document.createElement("li");
+                optionEl.classList.add("list-group-item")
+                optionEl.classList.add("placeholder2")
+                optionEl.classList.add("group-item")
+                optionEl.classList.add("non-selectable")
+                optionEl.classList.add("d-flex")
+                optionEl.classList.add("justify-content-between")
+                optionEl.classList.add("align-items-center")
+                optionEl.setAttribute("onclick", "select(this, '"+groupOptions[i].name+"')");
+                optionEl.value = groupOptions[i].id;
+                inner = "<div><b>" + groupOptions[i].name + "</b></div><div><form action='/api/deleteGroup' method='POST' onsubmit=\"return confirm('Are you sure you want to delete this group?');\"><button type='submit' class='btn btn-danger btn-sm ml-2' name='action' value='" + groupOptions[i].id + "'>Delete</button></form></div>";
+                optionEl.innerHTML = inner
+                group_select.appendChild(optionEl);
+                noGroups = false
+            }
+        }
+        if (noGroups) {
+            var optionEl = document.createElement("li");
+            optionEl.classList.add("list-group-item")
+            optionEl.classList.add("placeholder2")
+            optionEl.classList.add("group-item")
+            optionEl.classList.add("non-selectable")
+            optionEl.classList.add("d-flex")
+            optionEl.classList.add("justify-content-between")
+            optionEl.classList.add("align-items-center")
+            optionEl.innerHTML = "<b>No Groups Found</b>"
+            group_select.appendChild(optionEl);
+        }
+
+        var qrList = document.getElementById("qr_data_");
+        qrList.innerHTML = "";
+
+        labName = selected.dataset.labName
+        userText = document.getElementById("groupAndLab")
+        userText.innerHTML = "QR Codes for " + labName + " : "; 
+    }
+
+    function select(item, name) {
+        var listItems = document.querySelectorAll('.placeholder2')
+        listItems.forEach(function(li) {
+            li.classList.remove('selected');
+        });
+
+        // Add 'selected' class to the clicked list item
+        item.classList.add('selected');
+
+        userText = document.getElementById("groupAndLab")
+        substr = userText.innerHTML.substring(0,userText.innerHTML.indexOf(':') + 2); 
+        userText.innerHTML = substr + name
+
+        var qrList = document.getElementById("qr_data_");
+        qrList.innerHTML = "";
+
+        var qrData = {{qr_data | tojson }}; 
+
+        for (var key in qrData) {
+            if (qrData.hasOwnProperty(key)) {
+                if (key == item.value) {
+                    var qrListItems = qrData[key];
+                    for (var i = 0; i < qrListItems.length; i++) {
+                        var listItem = document.createElement('li');
+                        listItem.setAttribute('style', 'white-space: pre;');
+                        listItem.classList.add("list-group-item");
+                        listItem.classList.add("group-item");
+                        listItem.classList.add("non-selectable");
+                        listItem.id = qrListItems[i][0]; 
+                        listItem.setAttribute("onclick", "editQR(this," + key + ")")
+                        for (var j = 0; j < qrListItems[i].length; j++) {
+                            if (j==0) {
+                                listItem.innerHTML = "<b>ID: " + qrListItems[i][j] + "</b>\n"
+                            }
+                            else {
+                                if (qrListItems[i][j] != "") {
+                                    listItem.innerHTML += "<b>Attribute " + j + "</b>: " + qrListItems[i][j] + "\r\n"; 
+                                }
+                            }
+                        }
+                        qrList.appendChild(listItem);
+                    }
+                }
+            }
+        }
+        if (qrList.innerHTML == "") {
+            var listItem = document.createElement('li');
+            listItem.setAttribute('style', 'white-space: pre;');
+            listItem.classList.add("list-group-item");
+            listItem.classList.add("group-item");
+            listItem.classList.add("non-selectable");
+            listItem.innerHTML = "<b>No QR Codes Found</b>"
+            qrList.appendChild(listItem)
+        }
+    }
+
+    function editQR(item, key) {
+
+        selectQRID = document.getElementById("QR_ID")
+        selectQRID.innerHTML = ""
+        newOption = document.createElement("option")
+        newOption.id = item.id
+        newOption.value = item.id
+        newOption.innerHTML = item.id
+
+        groupInput = document.getElementById("groupID")
+        groupInput.value = key
+
+        selectQRID.appendChild(newOption)
+
+
+        $("#editModal").modal('toggle');
+    }
+
+    function populateGroupsModal() {
+        var lab = document.getElementById("lab_select");
+        var group_select = document.getElementById("group_select");
+
+        var selectedLab = lab.value; 
+
+        group_select.innerHTML = ""; 
+
+        var labData = groups[selectedLab]
+        if (labData && labData.groups) {
+            var groupOptions = labData.groups;
+            for (var i = 0; i < groupOptions.length; i++) {
+                var optionEl = document.createElement("option");
+                optionEl.value = groupOptions[i].id;
+                optionEl.textContent = groupOptions[i].name; 
+                group_select.appendChild(optionEl);
+            }
+        }
+    }
+
+    function validateForm(element) {
+      
+      var inputs = element.querySelectorAll("input, select");
+
+
+      for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].value.trim() === "") {
+          document.getElementById("alert").style.display = "block";
+          return false;
+        }
+      }
+      document.getElementById("alert").style.display = "none";
+      return true; 
+
+    }
+
+    function createLab() {
+        $("#createLabModal").modal("toggle"); 
+    }
+
+    function createGroup() {
+        $("#createGroupModal").modal("toggle");
+    }
+
+    function joinLab() {
+        $("#joinLabModal").modal("toggle"); 
+    }
+
+    function labInfo(invite_code, lab_id) {
+
+
+        var lab_members = JSON.parse('{{ session['labMembers'] | tojson | safe}}');
+        var lab_members_list = document.getElementById("lab_members_list");
+        lab_members_list.innerHTML = "";
+        for (var key in lab_members) {
+            if (lab_members.hasOwnProperty(key)) {
+                if (key == lab_id) {
+                    var members = lab_members[key];
+                    for (var i = 0; i < members.length; i++) {
+                      
+                      var form = document.createElement('form');
+                      form.setAttribute('action', '/api/removeLabMember');
+                      form.setAttribute('method', 'POST');
+                      form.setAttribute('onsubmit', 'return confirm("Are you sure you want to remove this member?");');
+                      
+                      var inputHidden = document.createElement('input');
+                      inputHidden.setAttribute('type', 'hidden');
+                      inputHidden.setAttribute('name', 'lab_id');
+                      inputHidden.setAttribute('value', lab_id);
+                      form.appendChild(inputHidden);
+
+                      var inputButton = document.createElement('button');
+                      inputButton.setAttribute('type', 'submit');
+                      inputButton.setAttribute('class', 'btn btn-danger btn-sm ml-2');
+                      inputButton.setAttribute('name', 'action');
+                      inputButton.setAttribute('value', members[i][0]);
+                      inputButton.innerHTML = 'Remove';
+
+                      form.appendChild(inputButton);
+                      
+                      var listItem = document.createElement('li');
+                      listItem.classList.add("non-selectable");
+                      listItem.innerHTML = "<b>" + members[i][1] + "</b>"
+              
+                      listItem.appendChild(form);
+                      lab_members_list.appendChild(listItem);
+                    }
+                }
+            }
+        }
+
+
+        document.getElementById("show_invite_code").innerHTML = invite_code
+        $("#inviteCodeModal").modal("toggle"); 
+    }
+
+
+
+</script>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

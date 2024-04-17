@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiQRo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+ 
+  <style>
+    /* Custom CSS for TV-shaped outer container */
+    html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+    .tv-container {
+      position: relative;
+      width: 100%; /* Cover entire width of the page */
+      height: 100vh; /* Cover entire height of the viewport */
+      background-color: #333; /* Dark grey background */
+      overflow: hidden;
+      border-radius: 0; /* Square outer corners */
+    }
+
+    .tv-screen {
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      right: 5px;
+      bottom: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      background-color: #fff; /* White background for inner content */
+      border-radius: 20px; /* Rounded corners for inner content */
+      overflow: hidden;
+    }
+
+    /* White text for navbar items */
+    .navbar-nav .nav-link {
+      color: #333;
+    }
+
+    /* Padding for tab content */
+    .tab-content .tab-pane .content-wrapper {
+      padding-top: 10px; /* Top padding */
+      padding-bottom: 10px; /* Bottom padding */
+      padding-left: 15px; /* Left padding */
+      padding-right: 15px; /* Right padding */
+    }
+
+    .container {
+            align-items: stretch;
+            width: 100%;
+            height: 100vh;
+            min-width:100%;
+            position: relative;
+            display: flex;
+            padding: 0px;
+    }
+    
+    .left-space {
+            flex: 1.2;
+            background-color:white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            overflow-y: auto;
+            padding: 0px;
+            position: relative;
+    }
+        .left-space .app-bar {
+            position: sticky;
+            top: 0;
+            background-color: #F5F5F5;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            color: black;
+          
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 10px;
+            padding-top: 10px;
+            z-index: 1;
+        }
+        .left-space .content {
+            padding-top: 30px; /* Adjust padding to make space for the app bar */
+            padding-left: 2.5px; /* Add left padding for the content */
+            padding-right: 5px; /* Add right padding for the content */
+        }
+        .right-space {
+            flex: 1.8;
+            background-color: #FDFDFD;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            overflow-y: scroll;
+            position: relative;
+        }
+        .right-space .app-bar {
+            position: sticky;
+            top: 0;
+            background-color: #357EC7; /*#316FF6 #357EC7  #2F75B2  #357EC7;  */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            color: white;
+      
+            padding-left: 30px;
+            padding-right: 25px;
+            padding-top: 15px;
+            padding-bottom: 10px;
+            
+            z-index: 1;
+        }
+        .right-space .content {
+            padding-top: 25px; /* Adjust padding to make space for the app bar */
+            padding-left: 20px; /* Add left padding for the content */
+            padding-right: 20px; /* Add right padding for the content */
+        }
+        .divider {
+            flex: 0 0 25px;
+            background-color: transparent;
+        }
+        .content-wrapper {
+          padding: 0px;
+        }
+        .card-text {
+         font-size: 15px;
+        }
+
+        .card-title {
+         font-weight: bold;
+        }
+
+        /* Define fade-in-up animation */
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Apply fade-in-up animation to list items */
+        .list-group-item {
+          animation: fade-in-up 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
+
+        /* Define fade-in-right animation */
+        @keyframes fade-in-right {
+          0% {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        /* Apply fade-in-right animation to the target text */
+        .fade-in-right {
+          animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
+        }
+
+        .alert-fixed {
+          position:fixed; 
+          top: 0px; 
+          left: 0px; 
+          width: 100%;
+          z-index:9999; 
+          border-radius:0px
+        }
+        
+
+  </style>
+  <script src="group_choice_modal.js"></script>
+</head>
+<body>
+
+<div class="tv-container">
+  <div class="tv-screen">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand font-weight-bold" href="#">MiQRo</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link home" href="{{url_for('homepage')}}">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown"> <!-- Added dropdown class -->
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Labs
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{url_for('labsPage')}}">View Labs</a>
+                <div class="dropdown-divider"></div> 
+                <a class="dropdown-item" href="#" onclick="createLab()">Create a Lab</a>
+                <div class="dropdown-divider"></div> 
+                <a class="dropdown-item" href="#" onclick="joinLab()">Join a Lab</a>
+                <div class="dropdown-divider"></div> <!-- Divider between links -->
+                <a class="dropdown-item" href="#" onclick="createGroup()">Create a Group</a>
+            </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link home" href="{{url_for('render_generate_qrs')}}">Create QR Codes<span class="sr-only">(current)</span></a>
+        </li>
+
+          <!-- Add more nav items as needed -->
+        </ul>
+      </div>
+      <a class="btn btn-outline-danger ml-auto" href="{{url_for('logout')}}">Logout</a>
+    </nav>
+
+    <!-- Tab contents -->
+    <div class="tab-content">
+      <!-- Home Tab Content -->
+      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="content-wrapper">
+
+          <div class="spacer" style="width: 100%; height: 20px;"></div>   <!-- Welcome user -->
+          <h2 style="font-size: 16px;">Welcome <span class="font-weight-normal"id="user_name">, </span></h2>
+          <script>
+            const username = "{{session['name']}},";
+            document.getElementById("user_name").innerHTML = username;
+          </script>
+          <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+          <div class="container">
+            <div class="left-space">
+                <div class="app-bar">
+                  <div class ="row justify-content-start" style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 0px;">
+                   
+                    <i class="bi bi-person-workspace" style="font-size: 18pt;" data-toggle="tooltip" data-placement="top" title="You currently regulate 5 Labs"></i>
+                    <div style="width: 20px;"></div>
+                    <i class="bi bi-qr-code-scan" style="font-size: 18pt;" data-toggle="tooltip" title="You are a member in 5 active Labs "></i>           
+                  
+                    <script>
+                      $(document).ready(function(){
+                        $('[data-toggle="tooltip"]').tooltip();
+                      });
+
+                    </script>
+                    
+                  </div>
+
+                </div>
+                <div class="content">
+                    <div style="height: 1000px;">
+                      <!-- Column card buttons -->
+                      <div class="column">
+                        <div class="card" style="width: 18rem;">
+                          <div class="card-body">
+                            <h5 class="card-title">Fetch QR Data</h5>
+                            <p class="card-text">
+                              Conveniently access stored laboratory data quickly from anywhere.
+                            </p>
+                            <!-- Button trigger choose group modal -->
+                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#chooseGroupModal" data-action="fetch" id="fetchButton">
+                              Fetch QR Code
+                            </button>
+                           
+
+                          </div>
+                        </div>
+
+                        <div class="spacer" style="width: 100%; height: 20px;"></div>
+                      
+
+                      </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="right-space">
+                <div class="app-bar">
+                  <div class="row justify-content-between">
+                    <p style="margin: 0; font-weight: bold;">Shared Labs</p>
+                  
+                    <a href="{{url_for('labsPage')}}" class="btn btn-light" style="margin-right: 5px; font-size: 10pt;">Go to Labs</a>
+                  </div>
+                    
+                </div>
+                <div class="content">
+                    <div style="height: 1000px;">
+
+                      
+                      <div class="fade-in-right">
+                        Labs that have been shared with you
+                      </div>
+
+                      <div class="spacer" style="width: 100%; height: 15px;"></div>
+
+                      <ul class="list-group list-group-flush">
+                        {% for lab in session.get('labs') %}
+                        {% if not lab[3] %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center" style="padding-left: 0; padding-right: 0;">
+                          <div class="d-flex align-items-center">
+                          
+                            <i class="bi bi-qr-code-scan" style="color: #999;"></i>
+                            
+                            <span style="margin-left: 20px; font-size: 14.5px;">{{lab[1]}}</span>
+                          </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                      </ul>
+
+            
+                      
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+          <!-- Add more content here if needed -->
+        </div>
+      </div>
+
+      <!-- Add more tab contents here -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="chooseGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Let's choose a QR location</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+        <form id="setLabAndGroupForm" action="/set/labandgroup" method="POST" onsubmit="return validateForm(this)">
+
+          <div class="form-group">
+            <label for="labSelect">Lab</label>
+            <!-- Dynamic lab select menu -->
+            <select class="form-control" id="lab_select" name="labSelect" onchange="populateGroups()">
+              <option selected>Select a Lab</option>
+              {% for lab in session.get('labs') %}
+              <option value="{{lab[0]}}">{{lab[1]}}</option>
+              {% endfor %}
+              <!-- Lab options will be dynamically populated here -->
+            </select>
+          </div>
+
+          
+          <div class="form-group">
+            <label for="grpSelect">Group</label>
+            
+            <select class="form-control" id="group_select" name="grpSelect">
+              <option selected>Select a Group</option>
+             
+            </select>
+          </div> 
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="startScanButton" class="btn btn-primary">Start Scan</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Lab</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="createLabForm" action="/api/create_lab" method="POST"  onsubmit="return validateForm(this)">
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                  <label for="Group" style="font-weight: bold;">Lab Name:</label>
+                </div><div class="col-md-9">
+                  <input type="text" class="form-control" id="lab_name" name="lab_name" placeholder="Enter Lab Name" control-id="ControlID-4">
+                </div>
+              </div>
+              
+        </div>
+
+        <input type="hidden" name="returnTo" value="homePage">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="joinLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Join a Lab</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="joinLabForm" action="/api/join_lab" method="POST"  onsubmit="return validateForm(this)">
+  
+            <div class="form-group">
+                <div class="col-md-3">
+                  <label for="Group" style="font-weight: bold;">Invite Code:</label>
+                </div><div class="col-md-9">
+                  <input type="text" class="form-control" id="invite_code" name="invite_code" placeholder="Enter Lab Name" control-id="ControlID-4">
+                </div>
+              </div>
+              
+        </div>
+
+        <input type="hidden" name="returnTo" value="homePage">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Join</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="createLabForm" action="/api/create_group" method="POST"  onsubmit="return validateForm(this)">
+  
+            <div class="form-group">
+              <label for="labSelect">Lab</label>
+              <!-- Dynamic lab select menu -->
+              <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroups()">
+                <option selected>Select a Lab</option>
+                {% for lab in session.get('labs') %}
+                <option value="{{lab[0]}}">{{lab[1]}}</option>
+                {% endfor %}
+                <!-- Lab options will be dynamically populated here -->
+              </select>
+            </div>
+  
+            
+            <div class="form-group">
+              <label for="grpSelect">Group</label>
+              <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
+            </div> 
+        </div>
+
+        <input type="hidden" name="returnTo" value="homePage">
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="alert" class="alert-fixed alert alert-danger" style="display: none;">
+    Please fill out all fields.
+  </div>
+  
+
+<script>
+
+    var groups = JSON.parse('{{ session['groups'] | tojson | safe}}');
+    console.log(groups)
+
+    function populateGroups() {
+        var lab = document.getElementById("lab_select");
+        var group_select = document.getElementById("group_select");
+
+        var selectedLab = lab.value; 
+
+        group_select.innerHTML = ""; 
+
+        var labData = groups[selectedLab]
+        if (labData && labData.groups) {
+            var groupOptions = labData.groups;
+            for (var i = 0; i < groupOptions.length; i++) {
+                var optionEl = document.createElement("option");
+                optionEl.value = groupOptions[i].id;
+                optionEl.textContent = groupOptions[i].name; 
+                group_select.appendChild(optionEl);
+            }
+        }
+    }
+
+    function validateForm(element) {
+      
+      var inputs = element.querySelectorAll("input, select");
+
+
+      for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].value.trim() === "") {
+          document.getElementById("alert").style.display = "block";
+          return false;
+        }
+      }
+      document.getElementById("alert").style.display = "none";
+      return true; 
+
+    }
+
+
+    function createLab() {
+        $("#createLabModal").modal("toggle"); 
+    }
+
+    function joinLab() {
+        $("#joinLabModal").modal("toggle"); 
+    }
+
+    function createGroup() {
+        $("#createGroupModal").modal("toggle");
+    }
+
+    $(document).on('hidden.bs.modal', '.modal', function () {
+      document.getElementById("alert").style.display = "none";
+    });
+</script>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body>
+</html>
