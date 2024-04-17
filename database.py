@@ -24,7 +24,6 @@ class BaseModel(Model):
 class Users(BaseModel):
     user_id = AutoField(primary_key=True)
     email = CharField()
-    password = CharField()
 
 class Labs(BaseModel):
     lab_id = AutoField(primary_key=True)
