@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MiQRo</title>
+  <title>Bootstrap Navbar with TV-shaped Outer Container</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
  
   <style>
     /* Custom CSS for TV-shaped outer container */
@@ -88,8 +87,9 @@
             z-index: 1;
         }
         .left-space .content {
-            padding-top: 30px; /* Adjust padding to make space for the app bar */
-            padding-left: 2.5px; /* Add left padding for the content */
+            padding-top: 0px; /* Adjust padding to make space for the app bar */
+            margin-top: 0px;
+            padding-left: 10px; /* Add left padding for the content */
             padding-right: 5px; /* Add right padding for the content */
         }
         .right-space {
@@ -168,15 +168,6 @@
         .fade-in-right {
           animation: fade-in-right 0.5s ease-out; /* Adjust duration and timing function as needed */
         }
-
-        .alert-fixed {
-          position:fixed; 
-          top: 0px; 
-          left: 0px; 
-          width: 100%;
-          z-index:9999; 
-          border-radius:0px
-        }
         
 
   </style>
@@ -188,7 +179,7 @@
   <div class="tv-screen">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand font-weight-bold" href="#">MiQRo</a>
+      <a class="navbar-brand font-weight-bold" href="#">MiQR</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -222,49 +213,103 @@
       <a class="btn btn-outline-danger ml-auto" href="{{url_for('logout')}}">Logout</a>
     </nav>
 
-    <div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
-            <form id="grp-form" action="/api/create_group" method="POST">
-    
-              <div class="form-group">
-                <label for="labSelect">Lab</label>
-                <!-- Dynamic lab select menu -->
-                <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroups()">
-                  <option selected>Select a Lab</option>
-                  {% for lab in session.get('labs') %}
-                  <option value="{{lab[0]}}">{{lab[1]}}</option>
-                  {% endfor %}
-                  <!-- Lab options will be dynamically populated here -->
-                </select>
-              </div>
-    
-              
-              <div class="form-group">
-                <label for="grpSelect">Group</label>
-                <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
-              </div> 
-          </div>
-  
-          <input type="hidden" name="returnTo" value="homePage">
-    
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
-          </div>
+
+
+    <div class="content-wrapper">
+
+      <div class="spacer" style="width: 100%; height: 25px;"></div>   <!-- Fetch Page -->
+      <h2 class="title" style="font-weight: bold; margin-left: 14px;">Download QR Codes</h2>
+      <div class="spacer" style="width: 100%; height: 15px;"></div>
+      
+      <div class="container">
+        <div class="left-space">
+            <div class="content">
+              <br>
+
+              <form id="qr-create-form" action="/generate_codes" method="post" enctype="multipart/form-data">
+                <input class="form-control" type="text" id="number_of_codes" name="number_of_codes" placeholder="Enter the number of QR codes">
+                <div style="margin-bottom: 10px;"></div>
+                <input class="form-control" type="text" id="code_size" name="code_size" placeholder="Enter the QR code size"><br>
+                <button class="btn btn-primary btn-xl" value="submit" id="submit" type="submit" style="margin-top: 30px; margin-bottom: 0px;">Submit codes</button>
+            </form>
+
+        </br>
+    <a href="{{ url_for('static', filename=file_name) }}" download="{{ file_name }}" class="btn btn-success">Download PDF</a>
+    <br>
+    <hr>
+
+   
+        
+        <p>It appears you don't have a PDF plugin for this browser. You can <a href="{{ url_for('static', filename=file_name) }}">click here to download the PDF file.</a></p>
+    </object>
+
+            </div>
         </div>
-        </form>
-      </div>
+        <div class="divider"></div>
+        <div class="right-space" style="height: calc(100% - 240px);">
+            <div class="app-bar">
+                <div class="row">
+                    <object data="{{ url_for('static', filename=file_name) }}" type="application/pdf" width="80%" height="1000px">
+                                    
+                </div>
+                
+              </div>    
+        </div>
     </div>
 
-    <div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <!-- Add more content here if needed -->
+
+
+    </div>
+  </div>
+
+
+  <!-- Modal -->
+<div class="modal fade" id="chooseGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Let's choose a QR location</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+          <form id="grp-form" action="/set/labandgroup" method="POST">
+  
+            <div class="form-group">
+              <label for="labSelect">Lab</label>
+              <!-- Dynamic lab select menu -->
+              <select class="form-control" id="lab_select" name="labSelect" onchange="populateGroups()">
+                <option selected>Select a Lab</option>
+                {% for lab in session.get('labs') %}
+                <option value="{{lab[0]}}">{{lab[1]}}</option>
+                {% endfor %}
+                <!-- Lab options will be dynamically populated here -->
+              </select>
+            </div>
+  
+            
+            <div class="form-group">
+              <label for="grpSelect">Group</label>
+              
+              <select class="form-control" id="group_select" name="grpSelect">
+                <option selected>Select a Group</option>
+               
+              </select>
+            </div> 
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="startScanButton" class="btn btn-primary">Start Scan</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="createLabModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -327,62 +372,49 @@
         </form>
       </div>
     </div>
-
-
-
-    <div class="content-wrapper">
-
-      <div class="spacer" style="width: 100%; height: 25px;"></div>   <!-- Fetch Page -->
-      <h2 class="title" style="font-weight: bold;">Download QR Codes</h2>
-      <div class="spacer" style="width: 100%; height: 15px;"></div>
-      
-      <div class="container">
-        <div class="left-space">
-            <div class="content">
-              <br>
-
-              <form id="qr-create-form" action="/generate_codes" method="post" enctype="multipart/form-data">
-                <input class="form-control" type="text" id="number_of_codes" name="number_of_codes" placeholder="Enter the number of QR codes">
-                <div style="margin-bottom: 10px;"></div>
-                <input class="form-control" type="text" id="code_size" name="code_size" placeholder="Enter the QR code size"><br>
-                <button class="btn btn-primary btn-xl text-uppercase" value="submit" id="submit" type="submit">Submit codes</button>
-            </form>
-
-        </br>
-    <a href="{{ url_for('static', filename=file_name) }}" download="{{ file_name }}" class="btn btn-primary">Download PDF</a>
-    <br>
-    <hr>
-
-   
-        
-        <p>It appears you don't have a PDF plugin for this browser. You can <a href="{{ url_for('static', filename=file_name) }}">click here to download the PDF file.</a></p>
-    </object>
-
-            </div>
-        </div>
-        <div class="divider"></div>
-        <div class="right-space" style="height: calc(100% - 240px);">
-            <div class="app-bar">
-                <div class="row">
-                    <object data="{{ url_for('static', filename=file_name) }}" type="application/pdf" width="80%" height="1000px">
-                                    
-                </div>
-                
-              </div>    
-        </div>
-    </div>
-
-      <!-- Add more content here if needed -->
-
+  
+    <!-- Modal -->
+  <div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Create a Group</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"> <!-- Set max-height and enable overflow scrolling -->
+            <form id="grp-form" action="/api/create_group" method="POST">
     
+              <div class="form-group">
+                <label for="labSelect">Lab</label>
+                <!-- Dynamic lab select menu -->
+                <select class="form-control" id="lab_id" name="lab_id" onchange="populateGroups()">
+                  <option selected>Select a Lab</option>
+                  {% for lab in session.get('labs') %}
+                  <option value="{{lab[0]}}">{{lab[1]}}</option>
+                  {% endfor %}
+                  <!-- Lab options will be dynamically populated here -->
+                </select>
+              </div>
+    
+              
+              <div class="form-group">
+                <label for="grpSelect">Group</label>
+                <input type="text" class="form-control" id="group_name" name="group_name" placeholder="Enter Group Name" control-id="ControlID-4">
+              </div> 
+          </div>
   
-
+          <input type="hidden" name="returnTo" value="homePage">
+    
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" id="startScanButton" class="btn btn-primary">Create</button>
+          </div>
+        </div>
+        </form>
+      </div>
     </div>
-  </div>
-
-
-  
-  
     
   
   <script>
@@ -425,6 +457,7 @@
   </script>
   
   <!-- Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -433,4 +466,3 @@
   
   </body>
   </html>
-
