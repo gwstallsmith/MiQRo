@@ -6,38 +6,29 @@ import os
 from peewee import *
 import re
 import peewee
-
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
-
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, send_from_directory
 from authlib.integrations.base_client.errors import OAuthError
 from flask_session import Session
-
 from Scanner.MicroQRCodeScanner import do_stuff
 import base64
-
 from database import *
 from crypto import *
-
 import os
 from peewee import *
-
 from os import environ as env
 from playhouse.shortcuts import model_to_dict
 from dotenv import load_dotenv
-
 import shutil
 import json
-
 from collections import defaultdict
 from redis import Redis
 import random 
 import string
-
 import qrcode
 import segno
 
@@ -103,6 +94,7 @@ def callback():
     session["user_id"] = user.user_id
     session["labs"] = getUserLabs()
     session["groups"] = getUserGroups()
+    session['labMembers'] = getLabMembers()
     session["name"] = session["user"]["userinfo"]["given_name"]
     return redirect(url_for("homepage"))
 
@@ -370,8 +362,6 @@ def addQRData() :
         return redirect(url_for("scan"))
 
 
-    
-        
 
 @app.route('/labs', methods=['POST', 'GET'])
 def labsPage() :
@@ -396,60 +386,6 @@ def labsPage() :
     
     return render_template("labs.html", session = session, qr_data = qr_data_by_group)
 
-
-# ==========================================================================
-# CREATING ENDPOINTS FOR USER REGISTRATION
-@app.route('/api/register', methods=['POST'])
-def postUserCreated():
-    email = request.form.get('email')
-    password = hash_password(request.form.get('password'))
-    if not email:
-        return {'error': 'Invalid email'}, 400
-    if not password:
-        return {'error': 'Invalid email'}, 400
-    
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
-
-
-    user = Users.create(email = email, password = password)
-    userinfo = {
-        "email": user.email,
-        "user_id": user.user_id
-    }
-    session["user"] = userinfo
-
-
-    return render_template('index.html')
-
-@app.route('/api/login', methods=['POST'])
-def userLogin():
-    email = request.form.get('email')
-    password = hash_password(request.form.get('password'))
-    if not email:
-        return {'error': 'Invalid email'}, 400
-    if not password:
-        return {'error': 'Invalid email'}, 400
-    
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        return {'error': 'Invalid Email: Please provide a valid email address.'}, 400
-    
-    try:
-        user = Users.get(Users.email == email, Users.password == password)
-        
-        userinfo = {
-            "email": user.email,
-            "user_id": user.user_id
-        }
-
-        # Need to input session data appropriately
-        session["user"] = userinfo
-
-
-        return render_template('index.html')
-        return {'message': 'User logged in successfully'}
-    except Users.DoesNotExist:
-        return {'message': 'User not found'}
     
 
 #@app.route('/api/getUserLabs', methods=['GET'])
@@ -476,31 +412,6 @@ def getUserLabs() :
 
     return labs
 
-@app.route('/api/getUserLabsD', methods=['GET'])
-def getUserLabsD() :
-    query = (Labs
-             .select(Labs.lab_id, Labs.lab_name, Labs.invite_code)
-             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
-             .where(Lab_Permissions.user_id == session['user_id']))
-    
-    query2 = (Lab_Permissions.select(Lab_Permissions.lab_id, Lab_Permissions.lab_admin)
-              .where(Lab_Permissions.user_id == session['user_id']))
-    
-
-    
-    labs = [[lab.lab_id, lab.lab_name, lab.invite_code] for lab in query]
-
-    admin_labs = [(lab.lab_id, lab.lab_admin) for lab in query2]
-
-    lab_admins_dict = {lab_id: isAdmin for lab_id, isAdmin in admin_labs}
-
-    for lab in labs:
-        lab_id = lab[0]
-        lab.append(lab_admins_dict.get(lab_id, False))
-
-
-
-    return {"Result":labs}
 
 @app.route('/api/getUserGroups')
 def getUserGroups() :
@@ -516,23 +427,6 @@ def getUserGroups() :
         lab_groups[lab.lab_id] = {'name': lab.lab_name, 'groups': groups}
 
     return lab_groups
-
-@app.route('/api/getUserGroupsD')
-def getUserGroupsD() :
-    lab_groups = defaultdict()
-
-    user_labs = (Labs
-             .select(Labs.lab_id, Labs.lab_name)
-             .join(Lab_Permissions, on=(Labs.lab_id == Lab_Permissions.lab_id))
-             .where(Lab_Permissions.user_id == session['user_id']))
-    
-    for lab in user_labs:
-        groups = [{'id': group.group_id, 'name': group.group_name} for group in lab.groups]
-        lab_groups[lab.lab_id] = {'name': lab.lab_name, 'groups': groups}
-
-    return {"Lab Groups": lab_groups}
-
-    
 
 
 @app.route('/api/user', methods=['GET'])
@@ -658,15 +552,13 @@ def leave_lab():
 
     lab_id_ = request.form['action']
 
-    query = Lab_Permissions.delete().where((Lab_Permissions.lab_id == lab_id_) & Lab_Permissions.user_id == session["user_id"])
+    query = Lab_Permissions.delete().where((Lab_Permissions.lab_id == lab_id_) & (Lab_Permissions.user_id == session["user_id"]))
     query.execute()
 
     session['labs'] = getUserLabs()
     session['groups'] = getUserGroups()
 
     return redirect(url_for('labsPage'))
-
-
 
 
 
@@ -722,41 +614,42 @@ def get_groups():
     return None
 
 
-@app.route('/api/qrs/', methods=['GET'])
-def get_qrs():
-    qrs = [
-        model_to_dict(p)
-        for p in QRs
-    ]
-
-    if not qrs:
-        return {'qrs: ': len(qrs)}
+def getLabMembers():
+    #given a lab ID, return all non admin users in that lab
     
-    return {'qrs: ': qrs}
 
-@app.route('/getCurrentUser')
-def getCurrentUser(): 
-    return {"User: ": session['user']}
+    query = (Lab_Permissions.select(Lab_Permissions.lab_id).where((Lab_Permissions.user_id == session['user_id']) & (Lab_Permissions.lab_admin == True))).execute()
 
-@app.route('/qrbygroup')
-def qrbygroup(): 
-    query = (QRs
-             .select(QRs.group_id, QRs.qr_id, QRs.attr_0, QRs.attr_1, QRs.attr_2,
-                     QRs.attr_3, QRs.attr_4, QRs.attr_5, QRs.attr_6,
-                     QRs.attr_7, QRs.attr_8, QRs.attr_9)
-             .join(Groups, on=(QRs.group_id == Groups.group_id))
-             .order_by(QRs.group_id))
+    user_labs = [lab.lab_id for lab in query]
 
-    qr_data_by_group = {}
-    for qr in query:
-        group_id = qr.group_id
-        qr_info = [qr.qr_id, qr.attr_0, qr.attr_1, qr.attr_2, qr.attr_3,
-                   qr.attr_4, qr.attr_5, qr.attr_6, qr.attr_7, qr.attr_8, qr.attr_9]
-        if group_id not in qr_data_by_group:
-            qr_data_by_group[group_id] = []
-        qr_data_by_group[group_id].append(qr_info)
 
-    return {"Result":qr_data_by_group}
+    
+    query = (Lab_Permissions.select(Lab_Permissions.user_id, Lab_Permissions.lab_id).where((Lab_Permissions.lab_id.in_(user_labs)) & (Lab_Permissions.lab_admin == False))).execute()
+   # users = [user.user_id for user in query]
+
+    user_data = defaultdict(list)
+    for entry in query: 
+        query = Users.select(Users.email).where(Users.user_id == entry.user_id).execute()
+        email = [user.email for user in query]
+        user_data[str(entry.lab_id)].append([str(entry.user_id), str(email[0])])
+
+   
+
+    return user_data
+
+
+@app.route('/api/removeLabMember', methods=['POST'])
+def removeLabMember():
+    lab_id = request.form['lab_id']
+    user_id = request.form['action']
+
+    query = Lab_Permissions.delete().where((Lab_Permissions.lab_id == lab_id) & (Lab_Permissions.user_id == user_id))
+    query.execute()
+
+    session['labMembers'] = getLabMembers()
+
+    return redirect(url_for('labsPage'))
+    
 
 
 
@@ -789,19 +682,6 @@ def generate_qr_code():
 
     # Loop to generate QR codes
     for i in range(get_highest_qr_id(), number_of_codes + get_highest_qr_id()):
-        #qr = qrcode.QRCode(
-        #    version=40,
-        #    error_correction=qrcode.constants.ERROR_CORRECT_M,
-        #    box_size=qr_size,
-        #    border=border_size,
-        #)
-
-        #QRs.create(qr_id=str(i))
-
-        #qr.add_data(str(i))
-        #qr.make(fit=True)
-        #img = qr.make_image(fill_color="black", back_color="white")
-        #qr_codes.append(img)  # Append QR code image to list
 
         qr = segno.make(str(i), micro=True)
         QRs.create(qr_id=str(i))

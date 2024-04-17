@@ -12,10 +12,7 @@ import svgwrite
 import subprocess
 from collections import defaultdict
 
-#Get Image and Scanner Pathname
-#print("Image File")
-#imgpath = askopenfilename()
-#imgpath = "C:/users/rwojtowi_stu/desktop/testimage123.png"
+
 def do_stuff(imgPath, output):
     imgpath = imgPath
     scannerPath = "scanner/java/applications.jar"
@@ -24,19 +21,7 @@ def do_stuff(imgPath, output):
 
     imgname = imgpath[imgpath.rfind("/")+1:imgpath.rfind(".")]
     imgFile = imgpath[imgpath.rfind("/")+1:len(imgpath)]
-    #print(imgname)
-
-    #scannerPath = askopenfilename()
-
-   # print("json output directory")
-   # outputPath = askdirectory()
-    #outputPath = "C:/users/rwojtowi_stu/desktop"
-    #outputPath = input("outputPath: ")
-    #AI Upscale Model path
-   # print("AI Upscale model path")
-  #  AIpath = askopenfilename()
-    #AIpath = "C:\\Users\\rwojtowi_stu\\downloads\\espcn_x2.pb"
-    #AIpath = input("AIpath: ")
+   
 
     cwd = os.getcwd()
     print(cwd)
@@ -51,15 +36,15 @@ def do_stuff(imgPath, output):
     #Read Image
     img = cv2.imread(imgpath)
     print(img)
-    #assert img is not None, "Image not found"
+   
     assert img is not None, "Image not found"
+    
     #show image
     imgX = img.shape[1]
     imgY = img.shape[0]
-    #Run MicroQR Scanner
-    #print(imgpath + '\n')
-    #imgpath = 'QRSamsungFar.png'
-    #print(imgpath + '\n')
+
+  
+
     java_command = f"java -jar Scanner/java/applications.jar BatchScanMicroQrCodes -i {imgpath} -o outputs/output.json"
     result = subprocess.run(java_command, shell=True, capture_output=True)
     print(result.stdout)
@@ -137,9 +122,7 @@ def do_stuff(imgPath, output):
             print(maxX-minX)
             subImg = img[int(minY):int(maxY),int(minX):int(maxX)]
             ##Display Sub Image
-            #cv2.imshow("subImage",subImg)
-            #cv2.waitKey(0)
-            ##End display
+           
             #Super Resolution
             SR[increment][0] = sr.upsample(subImg)
             #Resized x0.5
@@ -215,11 +198,7 @@ def do_stuff(imgPath, output):
                 MQR = {"Data":newScan[increment2],"BoundingBox":{"Point1":{"x":coordinates2[0][0],"y":coordinates2[0][1]},"Point2":{"x":coordinates2[1][0],"y":coordinates2[1][1]},"Point3":{"x":coordinates2[2][0],"y":coordinates2[2][1]},"Point4":{"x":coordinates2[3][0],"y":coordinates2[3][1]}}}
                 increment2 += 1
                 oldData[imgpath]["MicroQRCode"+str(increment2+noMQRs)] = MQR
-                ###Debug
-                #print(coordinates)
-                #print(coordinates2)
-                #print(minXArr[increment])
-                #print(minYArr[increment])
+               
     #print(oldData)
     jsonFile.seek(0)
     json.dump(oldData, jsonFile, indent = 4)

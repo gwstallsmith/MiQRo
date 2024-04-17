@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MiQR</title>
+        <title>MiQRo</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -202,7 +202,7 @@
         <div class="tv-screen">
           <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand font-weight-bold" href="#">MiQR</a>
+        <a class="navbar-brand font-weight-bold" href="#">MiQRo</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -255,15 +255,15 @@
           <div>
               {% if lab[3] %}
               <form action="/api/deleteLab" method="POST" onsubmit="return confirm('Are you sure you want to delete this lab?');">
-                  <button type="button" class="btn btn-primary btn-sm ml-2" onclick="labInfo('{{ lab[2] }}')">Info</button>
-                  <button type="submit" class="btn btn-outline-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Delete</button>
+                  <button type="button" class="btn btn-primary btn-sm ml-2" onclick="labInfo('{{ lab[2] }}','{{ lab[0] }}')">Info</button>
+                  <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Delete</button>
               </form>
               {% endif %}
           </div>
           {% if not lab[3] %}
           <div>
             <form action="/api/leaveLab" method="POST" onsubmit="return confirm('Are you sure you want to leave this lab?');">
-                <button type="submit" class="btn btn-outline-dark btn-sm ml-2" name="action" value="{{lab[0]}}">Leave</button>
+                <button type="submit" class="btn btn-danger btn-sm ml-2" name="action" value="{{lab[0]}}">Leave</button>
             </form>
             </div>
             {% endif %}
@@ -425,7 +425,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="defineModalLabel">Define QR data</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -461,7 +461,7 @@
             <div class="mr-auto">
                 <button type="submit" name="action" class="btn btn-danger" value="delete" onclick="return confirm('Are you sure you want to delete this QR Code?')">Delete</button>
             </div>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <button type="submit" name="action" value="save" class="btn btn-primary">Save</button>
         </form>
         </div>
@@ -474,7 +474,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" style="font-weight: bold; font-size: 19pt;" id="exampleModalLabel">Lab Info</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -489,11 +489,21 @@
                         <span id="show_invite_code"></span>
                     </div>
               </div>
-        </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-3">
+                  <div class="col-md-3">
+                      <label for="Group" id="lab_members_header" style="font-weight: bold;">Lab Members: </label>
+                      <ul id="lab_members_list"></ul>
+                  </div>
+                  
+            </div>
+          </div>
 
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -726,8 +736,51 @@
         $("#joinLabModal").modal("toggle"); 
     }
 
-    function labInfo(code) {
-        document.getElementById("show_invite_code").innerHTML = code
+    function labInfo(invite_code, lab_id) {
+
+
+        var lab_members = JSON.parse('{{ session['labMembers'] | tojson | safe}}');
+        var lab_members_list = document.getElementById("lab_members_list");
+        lab_members_list.innerHTML = "";
+        for (var key in lab_members) {
+            if (lab_members.hasOwnProperty(key)) {
+                if (key == lab_id) {
+                    var members = lab_members[key];
+                    for (var i = 0; i < members.length; i++) {
+                      
+                      var form = document.createElement('form');
+                      form.setAttribute('action', '/api/removeLabMember');
+                      form.setAttribute('method', 'POST');
+                      form.setAttribute('onsubmit', 'return confirm("Are you sure you want to remove this member?");');
+                      
+                      var inputHidden = document.createElement('input');
+                      inputHidden.setAttribute('type', 'hidden');
+                      inputHidden.setAttribute('name', 'lab_id');
+                      inputHidden.setAttribute('value', lab_id);
+                      form.appendChild(inputHidden);
+
+                      var inputButton = document.createElement('button');
+                      inputButton.setAttribute('type', 'submit');
+                      inputButton.setAttribute('class', 'btn btn-danger btn-sm ml-2');
+                      inputButton.setAttribute('name', 'action');
+                      inputButton.setAttribute('value', members[i][0]);
+                      inputButton.innerHTML = 'Remove';
+
+                      form.appendChild(inputButton);
+                      
+                      var listItem = document.createElement('li');
+                      listItem.classList.add("non-selectable");
+                      listItem.innerHTML = "<b>" + members[i][1] + "</b>"
+              
+                      listItem.appendChild(form);
+                      lab_members_list.appendChild(listItem);
+                    }
+                }
+            }
+        }
+
+
+        document.getElementById("show_invite_code").innerHTML = invite_code
         $("#inviteCodeModal").modal("toggle"); 
     }
 
