@@ -15,7 +15,6 @@ from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for
 from authlib.integrations.base_client.errors import OAuthError
 
-from Scanner.MicroQRCodeScanner import do_stuff
 import base64
 
 from cryptography import *
