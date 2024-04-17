@@ -14,9 +14,3 @@ This GitHub repository hosts a project aimed at efficiently organizing laborator
 
 - **User Authentication**: Implement secure user authentication to control access and ensure that only authorized personnel can make changes to the material database.
 
-## Acknowledgments
-
-- Special thanks to the QR Code generation library contributors.
-- The project was inspired by the need for an efficient and accurate system for managing laboratory materials.
-
-Happy organizing! 🧪🔬✨
